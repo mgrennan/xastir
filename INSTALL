@@ -1,0 +1,1623 @@
+
+$Id: INSTALL,v 1.108 2012/11/01 18:57:18 we7u Exp $
+
+
+General steps to configure/compile/install Xastir:
+(See detailed steps and library installation instructions below)
+----------------------------------------------------------------------
+
+1) Get one of the source releases and explode it.
+
+  mkdir xastir
+  cp xastir*.tgz xastir
+  cd xastir
+  tar xzvf xastir*
+
+An alternative to the above steps is to use CVS to download the
+Xastir sources.  See README.CVS for those instructions.   CVS allows
+you to easily keep up to date with the developers.
+
+2) Go into the xastir directory to build the executable:
+
+  cd xastir*
+
+If you used CVS to fetch the sources, you need one more step here
+before you run configure:  "./bootstrap.sh"
+
+  ./configure
+  make
+  su (become the root user)
+  make install (make install-strip can be used after the first time)
+  chmod 4555 /usr/local/bin/xastir (only if you use kernel ax.25, see below) 
+  exit (from root)
+
+3) Xastir should be installed in /usr/local/bin (the default on most
+systems).  You can run it by typing this from a shell:
+
+    xastir &
+
+
+Short summary of libraries Xastir can use:
+-------------------------------------------------------------------------
+Motif or OpenMotif or LessTiff  Required  The GUI widget set
+pthreads                        Required  Threading capability
+Shapelib                        Recommended ESRI Shapefile maps and WX alerts
+pcre                            Recommended used with Shapefile maps
+Xpm                             Optional  XPM images + Snapshots + Printing
+ImageMagick                     Optional  MANY graphics images
+libtiff/libgeotiff/libproj      Optional  geoTIFF maps (USGS topos)
+AX.25                           Optional  Kernel AX.25 networking support
+festival                        Optional  Speaking alerts
+libcurl or wget                 Optional  Internet images as maps
+GPSMan/gpsmanshp                Optional  Converts GPS data to Shapefiles
+GDAL/OGR                        Optional  Many formats (coming soon)
+libdb (4.0 or newer)            Optional  Internet map caching (fast!)
+libpq                           Experimental Persistent data with Postgis
+libmysqlclient                  Experimental Persistent data with MySQL
+
+Library/Option Heirarchy:
+-------------------------
+
+    ImageMagick (Usually requires additional libraries)
+
+    GDAL/OGR (Usually requires additional libraries)
+
+    error_popups (Annoying popups, turned off by default)
+
+    libgc (developer stuff:  memory leak testing)
+
+    "festival --server &" (Xastir connects to this server)
+      |
+      `-----------> Festival
+ 
+    gprof
+      |
+      `-+---------> profiling (developer stuff)
+       /
+      |
+    gprof-helper.so
+
+    libax25
+      |
+      `-----------> AX25
+
+    libProj
+      |
+      `-+-------+-> GeoTiff
+       /       /
+      /       /
+    libtiff  /
+            /
+    libgeotiff
+
+    gpsmanshp
+      |
+      `-+------+--> GPSMan
+       /      /
+      |      /
+    tcl/tk  /
+           /
+    ShapeLib 
+      |
+      +-----------> rtree
+      |
+      `-+---------> Dbfawk
+       /
+      |
+    PCRE
+
+    libcurl or wget
+       |
+       `-+--------> map_caching
+        /
+       |
+    Berkeley DB
+
+
+    MySQL --------> MySQL database interfaces (Experimental)
+      |
+      `-+---------> db2APRS (Xastir connects to this server)
+       /
+      |
+    Meteo
+
+    Postgresql
+      |
+      `-+--------> Postgis database interfaces (Experimental)
+        |                      +
+       /        QGIS [station data in another GIS application]
+      |
+    Postgis
+
+---------------------------------
+
+
+Installing only the required libs gives you these capabilities:
+
+    PocketAPRS maps
+    aprsDOS maps
+    WinAPRS maps
+    MacAPRS maps
+    GNIS labels
+    Address searching
+    serial port and Internet gateway connectivity.
+
+Adding XPM or ImageMagick libs, ImageMagick's "convert" utility, and
+the "gv" utility gives you printing capability.  Postscript or
+emulated postscript printing capability is required for this as well.
+
+Adding XPM or ImageMagick libs plus "convert" also give the
+capability to create automatic PNG images on disk from the map
+screen (useful for web pages!).
+
+Adding Shapelib support also gives you the capability to use Tiger
+2000 maps which were converted to Shapefile format by ESRI.  This
+allows you to use free detailed street maps for any point in the
+U.S.
+
+Adding other libraries gives you the additional capabilities listed
+above.
+
+For those who would like to see the full list of libraries Xastir
+might use (to decide what packages to install), here's the ldd
+command run against a pretty much fully-loaded Xastir.  Note that
+quite a few of these libraries are pulled in by the ImageMagick
+library, and your library list may look little like it due to
+differences in how ImageMagick was compiled:
+
+  > ldd /usr/local/bin/xastir
+    libXm.so.3 => /usr/X11R6/lib/libXm.so.3 (0x40030000)
+    libXt.so.6 => /usr/X11R6/lib/libXt.so.6 (0x40287000)
+    libX11.so.6 => /usr/X11R6/lib/libX11.so.6 (0x402db000)
+    libMagick.so.0 => /usr/lib/libMagick.so.0 (0x403d7000)
+    liblcms.so.1 => /usr/lib/liblcms.so.1 (0x4052f000)
+    libfreetype.so.6 => /usr/lib/libfreetype.so.6 (0x40553000)
+    libexif.so.9 => /usr/lib/libexif.so.9 (0x405a9000)
+    libXext.so.6 => /usr/X11R6/lib/libXext.so.6 (0x405be000)
+    libSM.so.6 => /usr/X11R6/lib/libSM.so.6 (0x405cc000)
+    libICE.so.6 => /usr/X11R6/lib/libICE.so.6 (0x405d5000)
+    libbz2.so.1 => /usr/lib/libbz2.so.1 (0x405ed000)
+    libz.so.1 => /usr/lib/libz.so.1 (0x405fd000)
+    libpthread.so.0 => /lib/i686/libpthread.so.0 (0x4060c000)
+    libm.so.6 => /lib/i686/libm.so.6 (0x4065d000)
+    libdb-4.1.so => /usr/lib/libdb-4.1.so (0x40680000)
+    libXpm.so.4 => /usr/X11R6/lib/libXpm.so.4 (0x40744000)
+    librt.so.1 => /lib/librt.so.1 (0x40755000)
+    libcurl.so.2 => /usr/lib/libcurl.so.2 (0x40768000)
+    libXp.so.6 => /usr/X11R6/lib/libXp.so.6 (0x4078f000)
+    libshp.so.1 => /usr/local/lib/libshp.so.1 (0x40797000)
+    libpcre.so.0 => /usr/lib/libpcre.so.0 (0x4079f000)
+    libproj.so.0 => /usr/local/lib/libproj.so.0 (0x407ab000)
+    libtiff.so.3 => /usr/lib/libtiff.so.3 (0x407e2000)
+    libgeotiff.so => /usr/local/lib/libgeotiff.so (0x4082b000)
+    libax25.so.0 => /usr/lib/libax25.so.0 (0x4084d000)
+    libgdal.so.1 => /usr/local/lib/libgdal.so.1 (0x40856000)
+    libc.so.6 => /lib/i686/libc.so.6 (0x40b64000)
+    libdl.so.2 => /lib/libdl.so.2 (0x40c97000)
+    /lib/ld-linux.so.2 => /lib/ld-linux.so.2 (0x40000000)
+    libssl.so.0.9.7 => /usr/lib/libssl.so.0.9.7 (0x40c9b000)
+    libcrypto.so.0.9.7 => /usr/lib/libcrypto.so.0.9.7 (0x40ccb000)
+    libjpeg.so.62 => /usr/lib/libjpeg.so.62 (0x40dbd000)
+    libjasper-1.700.so.2 => /usr/lib/libjasper-1.700.so.2 (0x40ddd000)
+    libpng.so.3 => /usr/lib/libpng.so.3 (0x40e2c000)
+    libstdc++.so.5 => /usr/lib/libstdc++.so.5 (0x40e5b000)
+    libgcc_s.so.1 => /lib/libgcc_s.so.1 (0x40f1b000)
+
+
+
+Things you need for this version:
+---------------------------------
+ * Get Lesstif/OpenMotif from your favorite Linux/Unix distribution.
+-or-
+ * Lesstif: www.lesstif.org (look below for RED-HAT instructions)
+-or-
+ * OpenMotif: www.openmotif.org
+
+ * AX25 packages: (if you want support for kernel AX25 interfaces)
+    Lib AX25:http://prdownloads.sourceforge.net/ax25/libax25-0.0.7.tar.gz
+    AX25 apps:http://prdownloads.sourceforge.net/ax25/ax25-apps-0.0.4.tar.gz
+    AX25 tools:http://prdownloads.sourceforge.net/ax25/ax25-tools-0.0.8.tar.gz
+    The apps package is not required, but strongly suggested. These versions
+     are current as of the writing of this document; feel free to use newer
+     versions.  Make sure the versions you choose match your kernel version.
+    Also note that there are patches required to the 2.4 kernel for AX.25
+    kernel networking.  See the linux-hams mailing list for details.
+
+ * You should have glibc on your system that supports threads!
+
+
+For geoTIFF support (such as USGS DRG topo maps) you also need:
+
+    libtiff (should be on your distribution's CD's):
+    ------------------------------------------------
+        http://www.libtiff.org
+
+    libproj (proj-4.4.9):
+    ---------------------
+        http://proj.maptools.org/
+        http://www.remotesensing.org/proj/
+        http://wetnet.net/~we7u/xastir/
+
+    Datum translations (proj-nad27 or proj-datumgrid):
+    --------------------------------------------------
+        http://proj.maptools.org/
+        ftp://ftp.remotesensing.org/pub/proj/
+        http://wetnet.net/~we7u/xastir/
+
+    libgeotiff (libgeotiff-1.1.5 or libgeotiff-1.2.4):
+    --------------------------------------------------
+        http://dl.maptools.org/dl/geotiff/libgeotiff/
+        http://www.remotesensing.org/geotiff/geotiff.html
+        ftp://ftp.remotesensing.org/pub/geotiff/libgeotiff/
+        http://wetnet.net/~we7u/xastir/
+
+    Please note that the order of installation for the above libraries is
+    critical.  Follow the instructions below carefully.  Also, the particular
+    libgeotiff you use depends on the version of libtiff you have installed.
+
+For Linux kernel AX.25 interfaces, you require these packages:
+    Lib AX25:http://prdownloads.sourceforge.net/ax25/libax25-0.0.11.tar.gz
+    AX25 apps:http://prdownloads.sourceforge.net/ax25/ax25-apps-0.0.6.tar.gz
+    AX25 tools:http://prdownloads.sourceforge.net/ax25/ax25-tools-0.0.8.tar.gz
+    The apps package is not required, but strongly suggested. These versions
+     are current as of the writing of this document; feel free to use newer
+     versions.  Make sure the versions you choose are compatible with your
+     kernel version. See the AX.25 HOWTO and the linux-hams mailing list for
+     details.
+
+For speech support via the festival speech synthesis software you need:
+    festival:
+       http://www.speech.cs.cmu.edu/festival/
+       http://at.rpmfind.net/opsys/linux/RPM/redhat/7.0/powertools/i386/festival-1.4.1-5.i386.html
+
+    If you're running a slightly older version of Linux you'll need to install 
+    festival from sources to make it work properly.
+
+For ESRI Shapefile format maps/weather alert maps:
+    Shapelib:
+        http://shapelib.maptools.org/
+        http://wetnet.net/~we7u/xastir/
+    pcre:
+        http://www.pcre.org
+
+For GDAL/OGR:
+    http://www.gdal.org/
+    http://remotesensing.org/gdal/
+    http://www.maptools.org
+    http://wetnet.net/~we7u/xastir/
+
+For ImageMagick support for maps in any of 68 major graphics formats,
+   including the capability to use online maps and weather radar images:
+    ImageMagick:
+        http://www.imagemagick.org/
+
+To use online maps or findu.com historical data, you'll need wget or
+   libcurl/libcurl-devel installed.  Many systems have these pre-installed,
+   so check first.  You may need to upgrade your installed version for
+   this feature to work correctly from within Xastir:
+    Wget:
+        ftp://ftp.gnu.org/gnu/wget/
+    libcurl:
+        http://curl.sourceforge.net/
+
+
+To download GPS tracks/waypoints/routes from a Garmin GPS into Xastir,
+converting to Shapefile format maps as it runs, you'll need gpsmanshp and
+GPSMan.  GPSMan 6.0 and later has command-line support built-in so that
+Xastir can control it directly, but only GPSMan 6.1 and later are currently
+usable with Xastir:
+    gpsmanshp:
+        http://www.ncc.up.pt/gpsmanshp/
+    GPSMan:
+        http://www.ncc.up.pt/gpsman/
+        http://sunsite.unc.edu/pub/Linux/science/cartography
+
+See below for instructions on installing all of these libraries. Once the 
+  libraries are installed, ./configure should find the libraries and allow
+  compiling in support for the new features.
+
+
+If you wish to enable/disable configure's testing of certain
+features, you can add any of the following flags to configure:
+
+    --without-ax25
+    --without-festival
+    --without-gpsman
+    --without-imagemagick
+    --without-libproj
+    --without-geotiff
+    --without-gdal
+    --without-shapelib
+    --without-pcre
+    --without-dbfawk
+    --without-map-cache
+    --with-errorpopups
+    --with-libgc
+    --with-profiling
+    --with-rtree
+    --with-lsb
+    --with-postgis
+    --with-mysql
+
+For example, "./configure --without-ax25" will disable the AX.25
+networking code in Xastir.
+
+If you have installed Xastir before, read the "UPGRADE" file for
+information on changes in file location and permissions.
+
+
+First Time Install:
+-------------------
+
+   1. OPTIONAL:  If you wish to use AX.25 interfaces, install the AX.25
+      packages.  Verify that they are configured and working. Use "listen"
+      to watch the packets fly by after getting AX.25 configured and hooked
+      to a TNC.  Use the AX.25 HOWTO document to guide you in this process.
+
+
+   2. Install LessTif or OpenMotif
+
+     If you already have Motif or OpenMotif on your system, including
+     the development headers, then you won't need to install LessTif. Most
+     distributions include one of these; step 2a describes building from
+     source, while 2b describes installing from pre-built packages on
+     your distribution. Now that OpenMotif is available, you may be happier
+     running it than LessTif, but either one should work with Xastir.
+
+     Some users have had problems with OpenMotif, and others have had troubles
+     with LessTif. Symptoms are often menu problems (menus don't draw
+     correctly, menus won't respond to clicks). If you encounter these
+     problems, then uninstall the current Motif and install the other.  Several
+     Mac users have reported problems with OpenMotif, so LessTif may be a
+     better place to start.
+
+        2a. Download LessTif version 0.91.1 or higher or download OpenMotif.
+        Follow the instructions provided, compile it and install it.
+
+        Usually,
+         ./configure
+         make
+         su (root)
+         make install
+         /sbin/ldconfig
+         exit (from root)
+
+        Or you can try any other OSF/Motif(R) version 1.2
+
+
+       2b. Install LessTif or OpenMotif (from a package)
+
+       Download the lestif-devel (if it exists) and lestif, and install it
+       as your distribution instructs you to install packages.
+
+
+   3. OPTIONAL:  Install geoTIFF support.  Allows using USGS DRG topo maps or
+     other types of geoTIFF maps/images and has the ability to tile smaller
+     maps into a larger contiguous map of an area:
+
+
+       3a.  Check/Edit your startup files:
+       -----------------------------
+       Check that /usr/local/lib, /usr/lib, and /usr/X11R6/lib are
+       all listed in /etc/ld.so.conf, and run /sbin/ldconfig to
+       re-create the system's cache file. If you don't have
+       permission to edit this file:
+            Edit ~/.bashrc, ~/.bash_profile, .cshrc, or
+            .login and add:
+
+            export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib:/usr/X11R6/lib
+
+       This will let the loader find the shared libraries when it tries to
+       load Xastir into memory.
+
+       If you instead have a /etc/ld.so.conf.d directory, then this will add
+       the /usr/local/lib directory to the search:  Create a file in the
+       /etc/ld.so.conf.d called "local.conf".  The file should contain exactly
+       one line:
+
+            /usr/local/lib
+
+       Use your favorite text editor or use these commands:
+
+           echo "/usr/local/lib" > /etc/ld.so.conf.d/local.conf
+           ldconfig -v
+
+       Check that you aren't already defining LD_LIBRARY_PATH somewhere else.
+       If so, just add the paths above to it.  Make sure this environment
+       variable is defined in the current shell you're using to compile Xastir.
+       Note that if you're running Xastir SUID root, the LD_LIBRARY_PATH
+       variable is ignored.
+
+
+       3b. Install libproj:
+       --------------------
+     NOTE: You must install libproj BEFORE compiling libgeotiff, because
+       libgeotiff uses libproj to do the datum translations. If you install
+       libgeotiff first, datum translations won't work.
+
+       proj-nad27-1.1.tar.gz or proj-datumgrid-1.3.zip must be decompressed in
+       the nad subdirectory of the proj distribution directory before you run
+       configure.
+        
+        tar xzvf proj-4.4.9.tar.gz (or newer)
+        cd proj-4.4.9/nad
+        unzip ../../proj-datumgrid-1.3.zip (or tar xzvf ../../proj-nad27-1.1.tar.gz)
+        cd ..
+        ./configure
+        make
+        su (root)
+        make install
+        /sbin/ldconfig
+        exit (from root)
+
+        libproj should now be installed in:
+
+            /usr/local/include/
+            /usr/local/lib/
+            /usr/local/bin/
+            /usr/local/share/proj/
+
+       You may need to do this (as root) if the "make install" portion fails
+       because it can't find "ginstall":
+
+       cd /usr/bin
+       ln -s install ginstall
+
+       Then retry the "make install" portion above.
+
+
+       3c. Upgrade libtiff if needed:
+       -----------------------------
+       The best way to install libtiff is to get it from the ftp site
+       for your Linux distribution.  You must have libtiff 3.5.5 or
+       newer for libgeotiff 1.1.x to compile and run correctly, or libtiff
+       3.6.0 BETA or newer for libgeotiff 1.2.x to work correctly.
+
+       If you're using libtiff 3.6.0 BETA or newer, things are simplified.
+       Just use libgeotiff 1.2.x or newer and they should play nicely together.
+
+       ---------
+       Notes for older libtiff (less than 3.6.0 BETA):
+
+           If you are compiling libtiff from source, you must use
+           "make install_private" because the libtiff private include files
+           are required for libgeotiff to compile and work correctly.
+
+           You may also snag just the include files listed below from the
+           source distribution or the source RPM, and copy them manually to
+           their destinations.
+
+           The errors you'll get if you don't match up the older libtiff and
+           libgeotiff by way of the include files:  Xastir will seg-fault when
+           it tries to read a geotiff file.
+       ---------
+
+       If you upgrade libtiff, check that programs like XV, ImageMagick, and
+       the Gimp still run (if you have these programs installed).  Graphics
+       programs that read/write TIFF format depend on libtiff.
+
+
+       3d. Install libgeotiff:
+       -----------------------
+
+     NOTE: Depending on your version of libtiff, either libgeotiff-1.1.5 or
+       libgeotiff-1.2.4 may compile properly.  libgeotiff is intimately
+       tied to your version of libtiff.  libgeotiff 1.2.x or greater
+       requires libtiff-3.6.0 BETA or later.  If your version of libtiff is
+       older, get libgeotiff 1.1.4 or 1.1.5.  For the latter case you may
+       also have to download the sources for your version of libtiff in
+       order to copy one libtiff header file into the libgeotiff source
+       directory.
+
+     -----------------------
+     Pre 3.6.0 libtiff NOTE: You may need to snag some files from your exact
+       libtiff source distribution and place them into your /usr/include
+       directory before libgeotiff will compile.  Note:  I said use files from
+       the EXACT same distribution of libtiff that you already have installed!
+
+            libtiff/tiffconf.h
+            libtiff/tiffiop.h
+            libtiff/tif_dir.h
+            contrib/dosdjgpp/port.h
+
+       Drop all four files into the /usr/include/ directory, creating no 
+       subdirectories at all.  This allows the libgeotiff code to "see"
+       into the libtiff library so that it can use some functions that
+       aren't normally (publicly) available.  Try to make sure that
+       you're not overwriting any files in /usr/include/ by the same name.
+       Some of these files may already be present in /usr/local/.  If so,
+       they should be exact duplicates.  "diff filename1 filename2" will
+       tell you if there are any differences between two files.
+
+       If you'd rather not mess with the /usr/include directory,
+       you can drop the four files into the
+       libgeotiff-1.1.5/libtiff_private/ directory instead.  Libgeotiff
+       will pick up the files there, issue a warning to you that you're
+       using private include files, yet still compile in support for your
+       particular version of libtiff.
+
+       With libgeotiff-1.2.4/libtiff-3.6.0-beta or newer you shouldn't
+       need to copy these files across.  The newer libtiff and libgeotiff
+       can work together using public interfaces.
+     ------------------------
+
+        tar xzvf libgeotiff-1.2.4.tar.gz (or newer)
+        cd libgeotiff-1.2.4
+        ./configure
+        make
+        su (root)
+        make install
+        /sbin/ldconfig (tells the loader about the new libraries)
+        exit (from root)
+       libgeotiff should now be installed in:
+
+            /usr/local/include/
+            /usr/local/lib/
+            /usr/local/share/epsg_csv/
+            /usr/local/bin/
+
+       If you must re-run "configure" for any of these libraries, remember to 
+       delete "config.status" and "config.cache" files first.
+
+
+   4. RECOMMENDED:  Install ESRI Shapefile support.  Allows using many sources
+     of online polygon, polyline, and point maps, including ones from NOAA.
+     This is also the format for weather alert maps.  This support is provided
+     by the shapelib package.
+
+     NOTE:  There are TWO ways to install Shapelib, using the version of
+     Shapelib that comes with Xastir (statically linked with Xastir), or using
+     a separate Shapelib shared library (dynamically linked with Xastir).  If
+     you ONLY require Shapelib for Xastir and won't need it for any other
+     program, then you may use the private copy distributed with Xastir,
+     skipping the Shapelib install instructions in this section.  If you have
+     other programs which need Shapelib, then it is recommended that you
+     install Shapelib first as a shared library, per the instructions below.
+     If you skip the instructions in this sections, "./configure" will set the
+     compile up so that the private Shapelib code will be statically
+     linked to the executable.
+
+     It isn't clear from the install instructions in shapelib, but just 
+     installing the library is sufficient, and just typing "make" and 
+     "make install" doesn't make or install the libraries.  Take these steps:
+
+       make lib
+       su (root)
+       make lib_install
+       /sbin/ldconfig
+       exit (from root)
+
+     and you should have what you need.
+ 
+     You may also need to tweak "/etc/ld.so.conf" to contain the proper path
+     to the libraries and then run /sbin/ldconfig to update "/etc/ld.so.cache".
+     Once this is done the loader should be able to find the Shapelib library.
+     Must run /sbin/ldconfig as root for the system to be able to re-create its
+     cache file.  See the instructions earlier in this file if you have an
+     /etc/ld.so.conf.d directory instead (section 3A).
+
+     For MacOSX:  Bill Owen, N2RKL, suggested the following for
+     ShapeLib:
+
+       "The shapelib Makefile wouldn't work out of the box, so I
+       figured out what the important bits were and built them by
+       hand:"
+
+       -----------------------------------------------
+         cc -c shpopen.c
+         cc -c shptree.c
+         cc -c dbfopen.c
+         ar cru libshp.a shpopen.o shptree.o dbfopen.o
+         sudo cp libshp.a /sw/lib
+         sudo ranlib /sw/lib/libshp.a
+         sudo mkdir /sw/include/libshp
+         sudo cp shapefil.h /sw/include/libshp/
+       -----------------------------------------------
+
+    Note that you'll have to set up /etc/sudoers file to allow those
+    commands to be run by a normal user before sudo will work for
+    you.  See the README.CVS file for sudo instructions.
+
+
+    Note from Gale Wilkinson, kc4pl:
+    > >
+    > > How do you get shapelib to "make" properly under cygwin?    I
+    > > have installed the latest cygwin (packages per the win32
+    > > install notes) and then downloaded and unpacked the latest
+    > > shapelib source package for compiling.  But when trying to do
+    > > the "make lib" it errors out part way through the process.
+    > > The error seems to be:
+    > >
+    > >  dbfopen.lo: In function 'DBFReadAttribute':
+    > > /home/gwilkinson/src/shapelib-1.2.10/dbfopen.c:724:undefined reference to '__getreent'
+    > > /home/gwilkinson/src/shapelib-1.2.10/dbfopen.c:716:undefined reference to '__getreent'
+    > > make: *** [lib] Error 1
+
+    Dan Brown, n8ysz, responded:
+    >
+    > I wrote this to get/make shapelib: 
+    >
+    > http://brauhaus.org/xastir/get_shapelib.sh
+    > or
+    > http://brauhaus.org/xastir/get_shapelib.sh.txt
+
+    This script is now also in the Xastir sources as
+    "xastir/scripts/get_shapelib.sh".
+
+
+    COMPILING OPTIONAL UTILITIES FOR SHAPELIB:
+
+    These utilities are sometimes useful when writing dbfawk rules
+    but aren't necessary for running Xastir.
+
+      cd xastir/src/shapelib
+      make -f Makefile_shapelib_orig
+
+      cd contrib
+      make -f Makefile_orig
+
+     You'll be left with useful executables in the xastir/src/shapelib and
+     xastir/src/shapelib/contrib directories.  It's your choice whether to
+     copy them to a directory in your path (perhaps /usr/local/bin?) to make
+     them easier to use.
+
+
+   5. OPTIONAL:  Install -either- GraphicsMagick or ImageMagick support as
+     shown below.  Xastir will use one or the other but not both.  It'll prefer
+     GraphicsMagick over ImageMagick if both are installed.  Do step 5a -or- 5b
+     below to get this type of image support compiled into Xastir.
+
+     Allows using more than 68 different graphics format files as maps, by
+     creating an associated .geo file for each with tie-points.  This support
+     will allow use of online Tiger and Terraserver maps with Xastir, and NOAA
+     weather radar images.  Other people are working on integrating even more
+     online mapping sources.  This will also allow you to use any GIF/JPG/XPM/
+     BMP/... image as an Xastir map. Installation instructions are included in
+     the package. If you choose to install from a binary install, be sure that
+     you have all the graphic format libraries that it was originally built
+     with.
+
+     The easiest way to install one of these is via a package from your linux
+     distribution's CD or ftp site. If you install from such a package, make
+     sure the header files are installed. These are often in a separate package
+     called GraphicsMagick-devel or ImageMagick-devel or similar.
+
+ 
+   5a. OPTIONAL:  Install GraphicsMagick support.
+
+     Download the GraphicsMagick sources from:
+
+     http://www.graphicsmagick.org
+
+     Uncompress/un-tar them...
+
+        tar -xzvf Gr*
+
+     Change directory to the newly created GraphicsMagick directory and
+     compile:
+
+        cd Gr*
+        ./configure --with-quantum-depth=16 --enable-shared
+        make
+        su -c 'make install'
+        su -c '/sbin/ldconfig'
+
+     Skip the next step (5b) as you only need ImageMagick support installed if
+     you _don't_ install GraphicsMagick.
+ 
+ 
+   5b. OPTIONAL:  Install ImageMagick graphics support.
+
+     Note that Xastir's "./configure" stage may fail trying to compile in
+     ImageMagick support.  If this happens, make sure you have the ImageMagick
+     development package installed if using RPM packages, or have installed
+     the ImageMagick header files.  If it still fails, check the "config.log"
+     file _very_ carefully.  Often ImageMagick tests fail due to some other
+     library that ImageMagick depends upon being absent, such as liblcms,
+     libbz2, or others.  This can also cause AX.25 support to be dropped in our
+     current "configure" script.  We're working on that.
+
+     Until the RPM packagers for ImageMagick include all of the dependent
+     libraries in their RPM dependency list, the best way to assure that
+     ImageMagick is installed properly is to install it from sources.
+
+     -------------------------------------------------------------------------
+     Note: Red Hat 9.0's install of ImageMagick does not work with
+     XASTIR.  It will need to be removed and installed from sources.
+     If w3m text based web browser is installed, you will need to remove
+     it before removing ImageMagick:
+
+        rpm -e w3m
+        rpm -e ImageMagick
+
+     Download the Imagemagick sources from:
+
+	ftp://ftp.imagemagick.org/pub/ImageMagick/
+
+     At the time of writing, this was
+
+	ftp://ftp.imagemagick.org/pub/ImageMagick/ImageMagick-5.5.7-34.tar.gz
+
+     But you may need to get a newer version by the time you read this.
+
+     Uncompress/un-tar them...
+
+        tar -xzvf im*
+
+     Change directory to the newly created ImageMagick directory and
+     compile:
+
+        cd im*
+        ./configure
+        make
+        su -c 'make install'
+        su -c '/sbin/ldconfig'
+
+     These instructions are courtesy of Wes Johnston.
+     -------------------------------------------------------------------------
+
+
+   6. OPTIONAL:  If your system doesn't have wget or libcurl/libcurl-devel
+     installed, and you want to use online maps, install either or both of
+     those packages now. Installation instructions are included in the
+     package.  Some older versions of wget don't work properly with
+     Xastir, so even if you already have wget you may need to upgrade it.
+
+     Please refer to the wget man pages or the web pages at
+     http://www.gnu.org/software/wget/wget.html for info concerning wget.
+
+     Note that if the remote server is down, Xastir can appear to hang
+     for a bit before wget times out.  Xastir calls wget with no retries
+     and a 30-second timeout, but one user reported that wget takes one
+     minute fifteen seconds to time out.  Also note that the users ~/.wgetrc
+     and the system-wide wgetrc file can change the timeouts and retries as
+     well.  See the man pages for details.  Pay particular attention to
+     which file/command-line-options take priority over others.  It looks
+     like the command-line option "--execute command" will allow overriding
+     the .wgetrc files, which means the user can override the hard-coded
+     timeouts/retries in Xastir by specifying new defaults in their ~/.wgetrc
+     file.
+
+     Libcurl should be a drop-in replacement for the wget functionality that
+     we use, and it's a faster and more secure method.
+
+   7. OPTIONAL:  Installing gpsmanshp/GPSMan allows Xastir to fetch GPS
+     waypoints/routes/tracks from a GPS.  Xastir can fetch the data
+     automatically, create a Shapefile map, then index/select/display the
+     new map.
+
+     Make sure you have Shapelib installed first (see above instructions).
+
+     Note that you may have to change the gpsmanshp Makefile to call out
+     "TCLVERSION = 8.4" instead of 8.3, depending upon which version of tcl is
+     installed on your system.  Use your package manager to determine this
+     ("rpm -q -a | grep tcl"), or you may be able to find out in /usr/lib by
+     typing "ls -ld tcl*".
+
+     Install gpsmanshp:
+
+     tar xzvf gpsmanshp_1.2.2.tgz
+     cd gpsmanshp
+     make
+     su -c 'make install'
+
+     Install GPSMan:
+
+     tar xzvf gpsman-6.0.tgz
+     cd gpsman-6.0
+     vi gpsman.tcl
+       Change SRCDIR line to: "set SRCDIR /usr/lib/gpsman"
+     su (root)
+     mkdir /usr/lib/gpsman
+     cp gpsman.tcl /usr/lib/gpsman
+     ln -s /usr/lib/gpsman/gpsman.tcl /usr/X11R6/bin/gpsman
+     cd gmsrc
+     cp * /usr/lib/gpsman
+     cp -R gmicons /usr/lib/gpsman
+     chmod -R 755 /usr/lib/gpsman
+     chmod 644 /usr/lib/gpsman/gmicons
+     chmod 777 /usr/local/share/xastir/maps/GPS   (IMPORTANT!)
+     exit (from root)
+
+     Verify that GPSMan will start up and will download information from a
+     Garmin GPS in Garmin-Garmin mode.  This also creates the configuration
+     files needed to use GPSMan with Garmin GPS's from within Xastir (sets
+     GPS type, serial port, etc within GPSMan's configs).
+
+   8. OPTIONAL: Install Festival for speech support
+      To use speech you must have a sound card and the 'festival' speech
+      synthesis software installed. Install Festival and start it in 'server'
+      mode prior to starting up XASTIR.  The normal command for this is
+      "festival --server &". More info about the speech features is in the
+      Xastir help file. An easy way to get festival installed on some systems
+      is to go to rpmfind.com and search for both festival and festival-dev,
+      then install the RPM's found. Red Hat RPM's installed onto SuSE 7.3 with
+      no problems. Note that the default voice doesn't speak numbers very well.
+      Edit /usr/share/festival/voices.scm and put "ked_diphone" at the first of
+      the "defvar default-voice-priority-list". This will change the default
+      voice to "ked_diphone".
+
+      Note that you can start up the festival server and test it out manually
+      by typing these commands:
+
+        telnet localhost 1314
+        (SayText "Hello")
+
+      To exit, press control-] and then type "quit".
+
+   9. OPTIONAL:  Install GDAL/OGR for support of many more map formats.
+
+      NOTE:  There are some cases where adding GDAL can mess up support for a
+      few of the other libraries, like Shapelib, libproj, or libgeotiff.  GDAL
+      may be compiled with support these libraries internally and it is
+      possible to have Xastir linked against some of GDAL's internal libraries
+      but using the external library headers.  If the versions of each are
+      sufficiently different, things may not work right.  If you run into such
+      problems you can either reconfigure GDAL to use external libraries for
+      these three or configure Xastir without GDAL support.  Also see the note
+      below about libtiff-3.8.0.
+
+      NOTE:  This is currently being added to Xastir:  Some support is there
+      now for the vector formats, but it isn't "pretty" yet.  Should you wish
+      to see what map formats your system will support once GDAL/OGR are fully
+      integrated into Xastir, proceed with the following:
+
+        cd ~src (or wherever you keep your sources)
+        export CVSROOT=:pserver:cvsanon@cvs.maptools.org:/cvs/maptools/cvsroot
+        cvs login
+        Password: <ENTER>
+        cvs checkout gdal
+
+      Optionally you can also use one of the newer GDAL releases, so in that
+      case just download that instead of the above instructions, then do the
+      following instructions for either:
+
+        cd gdal
+        ./configure --without-mysql 
+        make
+        su (root)
+        make install
+        /sbin/ldconfig
+        exit (from root)
+
+      A configure line that worked with older GDAL code was:
+
+        ./configure --without-jasper --without-ld-shared
+
+      Here's another GDAL configure command which forces GDAL to use its own
+      internal libraries for some of the formats:
+
+      ./configure --without-mysql --with-libz=internal --with-png=internal \
+      --with-jpeg=internal --with-geotiff=internal --with-libtiff=internal \
+      --with-gif=internal 
+
+      Also note that as of Dec 11, 2003, a major memory leak bug in the OGR
+      code was fixed, having to do with Shapefiles.  Please run a version of
+      GDAL/OGR that is newer than that date (or use the CVS version as
+      described above).
+
+      In one case linking in GDAL caused some GTIFProj4ToLatLong calls to break
+      in an odd manner due to Xastir linking in libgeotiff functions from the
+      GDAL library in that case instead of the libgeotiff library:  GeoTIFF's
+      with UTM coordinates stop working.  Configuring Xastir without GDAL
+      support -or- upgrading libtiff to 3.8.0 fixes the problem.
+
+   10. OPTIONAL:  Install Berkely DB Library to enable map caching
+      of internet maps.
+
+      Please note that segfaults (crashes) in Berkeley DB calls can be caused
+      by having multiple versions of the library installed.  The programming
+      interface has changed between the versions.  If you compile Xastir with
+      one version's header files but Xastir links to another version's
+      library, you can easily end up with segfaults when Xastir runs.  SuSE
+      Linux for instance has these available which you _should_ install:
+
+            db 
+            db-devel
+
+      Plus SuSE has these additional packages available which you should _not_
+      install.  Remove them if they're on your system (using YaST or rpm):
+
+            db-40
+            db42
+
+      Xastir will normally try to use /usr/include/db.h as the header file,
+      and /usr/lib/libdb.so as the library it will link to (which is usually
+      a symlink to something else, like /usr/lib/libdb-4.1.so).  If the
+      header file and the library file don't match, a segfault often occurs.
+      The easiest way to avoid problems is to keep one and only one version
+      of the Berkeley DB library on your system.
+
+      Here's how to test what version of include file and library file you're
+      using:  Find the db.h file.  It's usually in /usr/include/db.h.
+
+            grep DB_VERSION db.h
+
+      Mine shows this:
+
+        #define DB_VERSION_MAJOR        4
+        #define DB_VERSION_MINOR        1
+        #define DB_VERSION_PATCH        25
+        #define DB_VERSION_STRING       "Sleepycat Software: Berkeley DB 4.1.25: (October  2, 2003)"
+
+      Now do this:
+
+        ldd /usr/local/bin/xastir | grep libdb
+
+      Mine shows this:
+
+        libdb-4.1.so => /usr/lib/libdb-4.1.so (0x40680000)
+
+      In this case, version 4.1 of the include file matches 4.1 of the library
+      file, so it works fine.  A mismatch in the first two numbers can cause
+      segfaults when Xastir tries to do map caching.
+
+      If you install the Berkeley DB library in an unusual place (something
+      other than /usr/lib and /usr/include), you should still be able to tell
+      configure where to find it.  This comes courtesy of Tom Russo:
+
+      > > Someone installed Berkeley DB Library here:
+      > > 
+      > >     /user/local/BerkeleyDB.4.3/include/db.h
+      > > 
+      > > Perhaps I can assume that the library would be located here:
+      > > 
+      > >     /usr/local/BerkeleyDB.4.3/lib/libdb.so
+      > > 
+      > > How does one go about specifying the location of the db.h file and
+      > > the libdb.so file so that configure/compile/loading of Xastir work
+      > > properly?
+
+      > --with-bdb-libdir=/usr/local/BerkeleyDB.4.3/lib
+      > and
+      > --with-bdb-incdir=/usr/local/BerkeleyDB4.3/include
+
+   11. OPTIONAL:  Compile db2APRS and install MySQL and Meteo to
+      allow Davis weather station support.
+
+      Install MySQL and Meteo. 
+
+        "cd Davis"
+        "./bootstrap.sh"
+        "./configure"
+        "make"
+
+      This should build db2APRS in the "src" directory.  Start up db2APRS.
+      Xastir should be able to connect to the db2APRS server in order to get
+      the Davis weather station data.  See further instructions in the Davis
+      directory.
+
+   12. OPTIONAL: Experimental.  Add GIS database support.  
+
+      Note: Database support is experimental and any aspect may change at
+      any time, including database structures.  Scripts to create database
+      tables for MySQL and Postgres/Postgis are in the scripts directory
+      as db_gis_postgis.sql and db_gis_mysql.sql.
+
+      Warning: If you are connected to internet feeds for APRS data, it
+      is possible to accumulate several million station records per day
+      which could amount to around 300 MB of database records per day.  
+
+      Postgres + Postgis:
+      Install Postgres.  Include development packages (libpq).
+      Add Postgis spatial object support to Postgres.
+
+      Compile xastir with --with-postgis
+
+      After building xastir:
+      Create a database named xastir and a user with create rights on 
+      that database.
+      Edit db_gis_postgis.sql to set username and password for an xastir
+      user with select access to the xastir database.
+      Default values are database=xastir, user=xastir_user
+      You may also need to set permissions in pg_hba.conf.
+      Run the queries in db_gis_postgis.sql.
+      Run xastir and add a SQL Database interface, start with the postgis
+      defaults, add the username and password of the xastir user. 
+
+      Other GIS applications (e.g. QGIS, Mapserver, GRASS) can access and
+      display station data directly from the postgresql/postgis database.  
+
+      You can configure the database interface to read station from the 
+      database on startup and to save stations as they are heard to the
+      database.  This provides persistance of station data between
+      xastir sessions.
+
+      MySQL:
+      Install MySQL.  Include development packages (libmysqlclient).
+
+      Compile xastir with --with-mysql
+
+      After building xastir:
+      Create a database named xastir and a user with create rights on 
+      that database.
+      Edit db_gis_mysql.sql to set username and password for an xastir
+      user with select access to the xastir database.
+      Default values are database=xastir, user=xastir_user
+      Run the queries in db_gis_mysql.sql
+         mysql xastir -p < db_gis_mysql.sql
+      Run xastir and add a SQL Database interface, start with the MySQL
+      defaults, add the username and password of the xastir user. 
+
+      You can configure the database interface to read station from the 
+      database on startup and to save stations as they are heard to the
+      database.  This provides persistance of station data between
+      xastir sessions.
+
+      If you have one or more spatial database interfaces set to activate on 
+      startup, and this produces a situation that won't let you start xastir
+      normally [e.g. Station data with unusual characters could concevable 
+      cause xastir to segfault when retrieved from the database, and 
+      interactions between multiple databases that are both writing are 
+      reading station data at the same time from each other could potentally 
+      be unstable], you should be able to start xastir by editing the 
+      device configuration in ~/.xastir/config/xastir.cnf
+      Look for DEVICEn_TYPE:14 lines (where n is the interface number, between 0
+      and 14, TYPE:14 devices are sql database interfaces), and edit the
+      device to set both query on startup and on startup values to 0.
+      DEVICEn_QUERY_ON_STARTUP:0
+      DEVICEn_ONSTARTUP:0
+      If the cause is problematic data in your database, you may need to
+      run a delete query to eliminate the problematic row(s).  
+     
+ 
+   13. Building XASTIR:  Note that you'll need autoconf 2.53 or newer and
+      automake 1.6.3 or newer in order to run the "./bootstrap.sh" script.
+    
+        "./bootstrap.sh" (This step needed only for those using CVS)
+        "./configure"
+        "make" ("gmake" for Solaris or *BSD)
+
+     This builds XASTIR, You should not get any error or warning messages.
+
+     If you get the message from Xastir's configure script saying:
+
+       "**** NO MOTIF HEADERS FOUND **** install Motif development headers or
+         use --with-motif-includes to specify location of Xm/Xm.h" 
+
+     even though you've got the Motif libraries and headers installed in the
+     proper places, you might need to add this to the configure line:
+
+        "--x-includes=/usr/X11R6/include"
+
+     If that option does not help, then Motif is installed somewhere other 
+     than with the standard X includes.  You must locate the file "Xm.h," 
+     which should be in a subdirectory called "Xm" somewhere.  Once located
+     (let's say in /usr/include/Motif/Xm/Xm.h), use the configure option:
+
+       "--with-motif-includes=/usr/include/Motif"
+
+     If you get the message:
+
+       "**** MOTIF LIBRARIES NOT FOUND **** Install Motif development 
+        headers/libraries or use --with-motif-libraries to specify path 
+        to libXm.a"
+
+     then your Motif libraries are not installed in the same directory as your
+     other X libraries, and you must find the file libXm.a, libXm.so, 
+     or libXm.sl.  Once found (say in /usr/lib/Motif, for example), tell 
+     configure where to find it with:
+
+        "--with-motif-libraries=/usr/lib/Motif"
+
+     If you wish to install Xastir in a location other than the default
+     ("/usr/local/bin" and "/usr/local/share/xastir" directories), you may
+     add the "--prefix=<path>" flag to configure before compiling.  i.e.
+
+     "./configure --prefix=/home/apps/xastir"
+
+     Which will cause executables to be installed in "/home/apps/xastir/bin/"
+     and the rest of Xastir to be installed under the
+     "/home/apps/xastir/xastir/" directory.
+ 
+     This is useful if you don't have root access on a machine, but still
+     wish to install and use Xastir from your home directory.  There are
+     probably many other uses as well.
+
+     If you want to disable optional "dbfawk" support (see README.MAPS) then
+     add "--without-dbfawk" to your "./configure", i.e.
+
+     "./configure --without-dbfawk"
+
+     Most people will want the capability though.
+
+     You'll need the "pcre" package installed in order to compile in
+     dbfawk support.
+
+     To enable spatial indexing of shapefiles you can also add "--with-rtree" 
+     to your configure command line.  Using spatial indices can speed up access
+     of shapefiles that cover large areas if you're only viewing a smaller
+     area, but at the cost of some additional RAM to store the spatial
+     index.  This feature is still in the experimental phase, but some users
+     have observed a noticeable speed-up in map redraws, especially
+     with very large shapefiles.  The spatial indexing library used is based
+     on public domain code obtained from Melinda Green,
+     http://www.superliminal.com, but this code is included in xastir
+     so you don't need to download anything to use it.
+
+     If you see some errors, they might be because you are missing
+     GNU msgfmt or GNU gettext/xgettext?  These packages are required
+     to compile the latest Xastir sources.  Beware of packages with the
+     same names installed into /usr/openwin/bin, these are probably NOT
+     the GNU flavor of the executables and will not work for compiling
+     Xastir.  For SuSE Linux:  Install "development/gettext" using YaST.
+
+     If you do see some errors/warnings read the FAQ. If this doesn't help,
+     or you think you have a different problem, dump the errors/warnings to
+     a file, and send the file and the following information to the
+     developers:
+
+        System type (cpu), speed, memory,
+        Linux Distribution,
+        Linux Version,
+        X Window manager (KDE, GNOME, FVWM, etc..)
+
+
+     To install, type (as root)
+        "make install" (or make install-strip to remove debugging information)
+
+     If you later install additional libraries and just can't get
+     ./configure to see them, remove the config.cache file via this
+     command:  "rm config.cache", and then re-run configure.  Also
+     see the notes above about /sbin/ldconfig.
+
+
+   14. Kernel AX.25 Interfaces
+
+     NOTE:  Xastir is designed by amateur radio operators, for amateur
+     radio operators.  It is intended to be used only by them.  If there's
+     a way for unlicensed users to operate the amateur radio equipment
+     (this usually includes sending messages through it which key up the
+     transmitter), it is a violation of the rules and your license (and
+     more) may be at risk.  The same goes for igating:  Be aware of the
+     rules for your country with respect to gating traffic from the 'net
+     onto RF.  If there's any question, don't do it.
+
+     Please read this entire section before typing anything, as there are
+     serious security implications for some of this!
+
+     Option 1)
+     If you compiled support for AX.25 in and wish to use Kernel-mode
+     AX-25 interfaces, you _may_ need to type this as root:
+
+       chmod 4555 /usr/local/bin/xastir
+
+     This command makes Xastir run as user "root", no matter who actually
+     started it.  This allows Xastir to talk to the kernel AX.25 networking.
+     Note however that the above chmod command will prevent you from creating
+     a core file in case Xastir of a major program fault.  This core file aids
+     in debugging to trace what went wrong.
+
+     GENERAL SECURITY WARNING:
+     Beware that Xastir has not been audited for security, and makes limited
+     effort to drop extra privileges. Use this in a multi-user environment
+     at your own risk!  The developers have worked hard to fix remote buffer
+     overflows in the code to make Xastir safer to use, but there are _MANY_
+     potential security risks remaining in the code.  User beware!  We will
+     attempt to plug known security holes in future releases.
+
+     Also be aware that turning on the Interface->Server ports (TCP and UDP)
+     will allow other users who authenticate properly to send packets.  In
+     the case of TCP they can only get routed to other TCP ports and to the
+     internet.  UDP packets may also get routed to your RF ports (as
+     third-party packets).
+
+     LINUX-SPECIFIC SECURITY WARNING:  If you're using Linux AX.25 kernel
+     networking, you'll need to either make Xastir SUID-root, or use a shim
+     (which itself is set to SUID-root) between Xastir and the AX.25 ports.
+     See Option #2 below for the (possibly safer) shim method.  If you're the
+     paranoid type (and you should be if you're running a system with multiple
+     users), you may wish to skip SUID-root mode/kernel AX.25 interfaces and
+     use standard serial port TNC interfaces instead.  Any program is safer if
+     run as a normal user (not safe, but safer).  It is currently impossible
+     to use kernel-mode AX.25 interfaces without the program running with
+     root privileges.
+
+     Option 2)
+     A more security-conscious option is to use a shim program written by
+     Henk de Groot, PE1DNN.  This program runs in SUID-root mode but is
+     much smaller and so is easier to audit for security, and provides a
+     new port that Xastir can connect to.  The new port can be read/written
+     without having to be the root user.  The program is called aprs_tty
+     and can be obtained here:
+
+     http://wetnet.net/~we7u/xastir/aprs_tty.0.0.2.tgz
+
+     It actually responds to some TNC commands. The code is straight forward
+     and works well.  Run the program, telling it what port to use, and then
+     in XASTIR set up the TNC to point to the new TTY at 19200. It
+     transmits/receives UI frames, and sets the correct unproto path.  In
+     this case DO NOT perform the chmod 4555 command on the Xastir executable.
+
+     Note again that the same SUID-root warnings that were giving in option
+     #1 above also apply to aprs_tty.  Buyer beware!  As far as we know,
+     aprs_tty has not been audited for security, and makes no effort to drop
+     extra privileges. Use this in a multi-user environment at your own risk!
+
+
+   15. Serially-Connected TNC's
+
+     NOTE:  Xastir is designed by amateur radio operators, for amateur
+     radio operators.  It is intended to be used only by them.  If there's
+     a way for unlicensed users to operate the amateur radio equipment
+     (this usually includes sending messages through it which key up the
+     transmitter), it is a violation of the rules and your license (and
+     more) may be at risk.  The same goes for igating:  Be aware of the
+     rules for your country with respect to gating traffic from the 'net
+     onto RF.  If there's any question, don't do it.
+
+     Please read this entire section before typing anything, as there are
+     serious security implications for some of this!
+
+     If you're using a serial TNC, configure your TNC startup files in the
+     /usr/local/share/xastir/config directory:
+
+     tnc-startup.sys is used to set up your TNC for Xastir and tnc-stop.sys
+     is to change the TNC back to your normal settings. There are several
+     example TNC startup files in the directory.  Choose the one that best
+     suits your TNC and edit to taste.  See the note below about where to
+     edit the files.  You might be unpleasantly surprised if after you type
+     "make install" next, all your custom changes to the startup files are
+     lost.  As always, keep a backup.
+
+     Some people have had trouble getting Xastir to decode packets.  While
+     packets were scrolling quite nicely in the View->Incoming Packet Data
+     dialog, stations weren't showing up on the Xastir screen at all. The
+     cause was incorrect settings in the tnc-startup files for that specific
+     TNC. If you change these files in the xastir source directories make sure
+     to do a "make install" to install them into the
+     /usr/local/share/xastir/config/ directory. Another option would be to
+     edit the files in /usr/local/share/xastir/config/ directly. Keep a copy
+     of them in a safe place in any case.  You don't want to lose your custom
+     mods you worked so hard to create.
+
+     Some systems don't allow normal users to access the serial ports.  It's
+     a permissions thing, but is actually the _correct_ way to configure the
+     serial ports.  You can fix this in several ways:
+
+     1) Add the Xastir user to the group owning the serial ports.
+     2) Make Xastir run SGID-uucp (or whatever group owns the port).
+     3) Change the permissions of the device so that any user can access it.
+     4) Make Xastir run SUID-root.
+
+     Solutions 3 and 4 are highly discouraged.  It can be a security nightmare
+     to start opening up files or devices to read/write access by all users,
+     and the same for SUID-root programs.  Don't do either of these.
+
+     Exception:  If you're going to be running AX.25 kernel networking, you
+     may need to be running Xastir SUID-root anyway, or else you need to
+     install a shim program between the port and Xastir.  In the latter case
+     the shim is running SUID-root, not Xastir.  See the section above
+     regarding AX.25 kernel networking.
+
+     Here are what the default permissions usually look like for the
+     two serial ports on a Linux box:
+
+     crw-rw----    1 root     uucp       4,  64 Oct 19 08:15 ttyS0
+     crw-rw----    1 root     uucp       4,  65 Apr 14  2001 ttyS1
+
+     (NOTE:  For a Windows/Cygwin installation, a few details are different,
+     but the ttyS0 and ttyS1 keywords are the same.  Verify that the
+     permissions of these ports are set appropriately for a normal user to read
+     and write to these devices.)
+
+     Solution #1:  The root user would run the commands necessary to add
+     the Xastir user to the "uucp" group, which would then give the user
+     the necessary permissions to use the port.  Usually this involves
+     editing the /etc/group file, but SysAdmin tools usually exist for
+     doing this more easily.
+
+     Solution #2:  As root user, type these commands:
+
+        chgrp uucp /usr/local/bin/xastir
+        chmod 2555 /usr/local/bin/xastir
+
+     If you want to restrict Xastir so that only one user can run it,
+     (in this case "user1") type:
+
+        chown user1 /usr/local/bin/xastir
+        chmod 2500 /usr/local/bin/xastir
+        chgrp uucp /usr/local/bin/xastir
+
+     Solution #3:
+     You can change the permissions of the serial port to allow use by all
+     users, but this is highly discouraged.
+     Here's what Jack Twilley had to say with regards to "chmod uog+rw" (same
+     as chmod 555) for serial ports:
+
+     > This is not necessary, and opens up the possibility of abuse.  Not all
+     > Xastir installations are Linux boxes used by a single person with a
+     > single purpose -- I know of several instances that are multi-user
+     > machines with access to the Internet by multiple parties, some of whom
+     > are not licensed amateurs, and another couple of instances where the
+     > serial port is not always used by a TNC but also by other devices such
+     > as Palm HotSync cradles and GPS receivers.
+     > 
+     > Here are two more secure solutions:
+     > 
+     >  * use non-root users
+     >    One way to use the setuid facilities in Unix would be to set
+     >    the xastir binary's user ID to match the user that owns the serial
+     >    port.  Under Solaris, the default ownership of /dev/cua/a is
+     >    uucp:tty, with a default permission of 0600.  The command 'chown
+     >    uucp /usr/local/bin/xastir' followed by the command 'chmod 4555
+     >    /usr/local/bin/xastir' will allow xastir to run properly without
+     >    changing the serial port's permissions or ownership, thus
+     >    minimizing any impact on other applications that use the serial
+     >    port.
+
+Note from Curt:  This chmod command will prevent creation of "core"
+file that are useful for debugging in case Xastir crashes.
+
+     > 
+     >  * use groups
+     >    A better way to use the setuid facilities in Unix is to set the
+     >    xastir binary's *group* ID to match a group that already has the
+     >    privilege to mess with the serial port.  Under FreeBSD, the default
+     >    ownership of /dev/cuaa0 is uucp:dialer, with a default permission
+     >    of 0660.  The command 'chgrp dialer /usr/local/bin/xastir' followed
+     >    by the command 'chmod 2555 /usr/local/bin/xastir' will change
+     >    Xastir's group to the serial port's group, and then add the setgid
+     >    privilege to the binary.  Now when xastir starts up, it will have
+     >    the minimum privilege necessary to do what it needs to do, without
+     >    being yet another root exploit-in-waiting.
+
+
+   16. Serially-Connected Garmin RINO Radio/GPS
+
+     If you have a Garmin RINO attached to a serial port, have GPSMan
+     installed, and have support for GPSMan compiled into Xastir, then Xastir
+     has the capability to periodically download waypoints from the RINO unit
+     and create APRS(tm) Objects out of them.  Any RINO waypoints that begin with
+     "APRS" will be automatically created, placed on the map, and transmitted
+     as your own Xastir APRS(tm) objects.  If you wish to see them but not transmit
+     them, turn off Object/Item transmit or global transmit in the interface
+     menu.  Another option is to turn off the transmit enable per interface.
+
+     Please note that Xastir cannot cause the attached RINO to poll the other
+     RINO units on the air.  Xastir can only download the waypoints that the
+     attached RINO has collected from the other RINO units that it is passively
+     monitoring.
+
+     Here's a blurb from Wes Johnston about the RINO's:
+
+     "Lets say I have three RINO radios... two in the hands of the SAR teams on
+     the ground, and a third radio in a plane circling above.  It is preferred
+     that the radio in the hands of the SAR teams be the nicer rino120 since it
+     does mapping.  The radio in the plane can be the lowly rino110 since it
+     does not do mapping but you will have a copy of xastir with maps on the
+     laptop with you anyway.
+
+     If I set two of my rino radios to APRSSAR1 and APRSSAR2, and connect a
+     third rino radio to xastir with serial in the plane, xastir will query
+     rino radio #3 at any one minute interval between 0 and 30 minutes, get the
+     APRS* waypoints, lop off the first four characters and publish the shorter
+     named waypoints as SAR1 and SAR2 as APRS(tm) objects on to your TNC.  The
+     hitch to this is that the rino radio cannot automatically poll the RINO
+     users' locations on the ground.  You have to manually (on the radio)
+     select a menu item called POLL and poll the users that way.  The reason
+     the first four characters of the rino callsign have to be "APRS" is that
+     when you send a query, rino only asks about the first 4 chars... so any
+     station with the first four that match will answer... ie all of them in
+     your group.  The other method is to simply fly the plane overhead and
+     listen (eavesdrop) on the channel and passively pickup the locations of the
+     groups as they converse with one another.  The rino will send it's
+     location just as you un-key the PTT if it has been >30 sec since the last
+     time you sent your position.  It would be practical to simply ask each
+     team for an update... they just need to squeeze their PTT for a moment
+     (ie kerchunk) to send a position."
+
+
+   17. Start up XASTIR and read the help files to configure it. If you have 
+     problems, please consult the FAQ file.
+
+     You can now start XASTIR. On most systems that the path is set up in
+     FHS format just type "xastir". On other systems type
+     "/usr/local/bin/xastir" to start the program.
+
+     If you see errors at this point that say something like "Can't load
+     xxx library" this means you forgot to either update /etc/ld.so.conf (or
+     /etc/ld.so.conf.d directory on some systems) and run /sbin/ldconfig, or
+     add the LD_LIBRARY_PATH variable for your shell, and the "ld" loader
+     can't link the libraries with the Xastir executable to get it running in
+     memory.  Note that if you're running Xastir as SUID root, the
+     LD_LIBRARY_PATH variable is ignored.
+
+     To set a new language or change the language current choice, use
+     this command line:
+
+     xastir -l <language>
+
+     Current choices are:
+
+            Dutch English French German Italian Portuguese Spanish
+            ElmerFudd MuppetsChef OldeEnglish PigLatin PirateEnglish
+
+     This option will be stored in the users config file for the next time
+     Xastir is run. On new installs Xastir will default to English unless
+     you use this command line option.
+
+
+   CONNECTING TO AN INTERNET SERVER:
+
+   Here are some lists of Internet servers:
+
+        http://members.aol.com/wa8lmf3/miscinfo/APRServe.txt
+        http://www.wa6oft.com/APRServe.txt
+        http://www.aprs-is.net/aprsservers.htm
+        http://www.aprs-is.net/APRSServers.htm
+
+
+   Filter port syntax (for those ports that allow user-selectable
+   filtering):
+
+        http://www.aprs-is.net/javaprssrvr/javaprsfilter.htm
+
+
+   The procedure to connect to one of them is this:
+
+    *) Select Interface->Properties.
+    *) Click Add.
+    *) Select Internet Server, click Add.
+    *) Fill in the "Host" and "Port" boxes.
+    *) Enter the Pass-code found by running "callpass" with your callsign
+       in an xterm window.
+    *) Set the togglebuttons and filter parameters per your preferences.  The
+       "filter" keyword is added by Xastir, so you don't need to add that word
+       to the box.  If the box has anything in it, "filter" is prepended to the
+       text when Xastir sends the string to the server
+    *) Optionally put in a comment.  That shows up in the Interface and
+       Properties dialogs to remind you of the details for that connection.
+    *) Click OK.
+
+   A short list of the first-tier servers (you may want to connect to the
+   second-tier servers or regional/local servers instead):
+
+     first.aprs.net ports 10151 (history) or 10152 (no history)
+     second.aprs.net ports 10151 (history) or 10152 (no history)
+     third.aprs.net ports 10151 (history) or 10152 (no history)
+     fourth.aprs.net ports 10151 (history) or 10152 (no history)
+
+
+   FESTIVAL NOTE:  From: J. Lance Cotton:
+   One thing that I found that I had to do to finally get festival to work was
+   to get rid of the 'only localhost can connect to the server' pref in the
+   festival configuration. I don't know if that's the default on a source
+   install (I installed festival from RPM's), but it might be.
+   
+   I don't know why it doesn't let localhost connect, even though it's the
+   only one specifically allowed.
+   
+   Here's what to do:  Open the 'festival.scm' file (I found mine in
+   /usr/share/festival/' and look for the line that starts like:
+   
+       (defvar server_access_list ...
+   
+   Make it look like:
+   
+       (defvar server_access_list nil
+   
+   Then restart the festival server.
+   -Lance KJ5O
+
+   Additional note from Alan Crosswell:  If you run the festival_server
+   script instead of festival -server, then the permissions for localhost
+   get set up for you.
+
+
+You probably want to download some maps and additional data files. The
+instructions for this are in the README.MAPS.
+
+-----------------------------------------------------------------------
+
+NOTES FOR DEVELOPERS:
+---------------------
+
+Profiling:
+----------
+1) "./configure --with-profiling"
+
+This will add "-pg" to the CFLAGS section of the Makefiles, which
+turns on the collection of profiling data while the executable is
+running (on Linux anyway).
+
+2) "make clean"
+
+3) "make install" (Don't do "make install-strip" here, as that will
+strip off the symbol table information that gprof requires)
+
+4) "xastir &"
+
+5) Let Xastir run for some period of time.
+
+6) Close Xastir
+
+7) "gprof /usr/local/bin/xastir | tee profile.txt"
+
+Gprof will use the Xastir binary and the gmon.out file created from
+running Xastir to give you the profile listing.
+
+Add the "-l" flag to the gprof line to give you a line-by-line
+profile listing, but be prepared for a long run-time and a lot of
+CPU to be used by gprof to generate it:
+
+    "gprof -l /usr/local/bin/xastir | tee profile.txt"
+
+Also see this link, which talks about how to profile multi-threaded
+applications:
+
+    http://sam.zoy.org/writings/programming/gprof.html
+
+With the method described, you compile/install their library code,
+then invoke Xastir like this:
+
+    LD_PRELOAD=xastir/src/gprof-helper.so xastir &
+
+
+    mv gmon.out gmon.old; gprof /usr/local/bin/xastir gmon.old \
+    | tee profile.txt; gprof -l /usr/local/bin/xastir gmon.old \
+    | tee profile2.txt
+
+
+Checking for Memory Leaks:
+--------------------------
+
+A simple method for just checking malloc's/free's is to set
+MALLOC_CHECK to a 1 or a 2, at least on Linux.  See the malloc man
+page for more info.
+
+For more thorough checks, use libgc:
+
+1) Install libgc, the conservative garbage collector for C and C++.
+Find it at:
+
+    http://www.hpl.hp.com/personal/Hans_Boehm/gc
+
+Configure/install libgc like this:
+
+    ./configure --enable-threads=posix
+
+Make sure that "-DGC_LINUX_THREADS" and "-D_REENTRANT" are defined
+in the Makefile if you're compiling it on Linux.
+
+Optional:  Change Makefile to add "-DSAVE_CALL_CHAIN" on the DEFS
+line.  This will provide more of a stack trace each time a leak is
+found.  This is sometimes useful but much more verbose.
+
+    make
+    make check
+    su
+    make install
+    exit (from root)
+
+2) Now, back in the xastir directory:
+
+    ./configure --with-libgc
+
+Make sure that "-fomit_frame_pointer" is _NOT_ in the Makefiles.
+This will mess up the optional stack trace if present.
+
+    make clean
+    make install
+    xastir &
+
+Let Xastir run for some period of time.
+
+Libgc will dump messages to the xterm as memory leaks are found.
+Any Xastir memory leaks should have a filename and a line number
+listed.  Memory leaks from lower-level libraries will be missing the
+detailed information, so they are easy to spot (and mostly useless
+for the purpose of finding and patching memory leaks).
+
+Note also that libgc will take Xastir's memory usage up quite a bit,
+so don't be surprised if Xastir uses two or three times the normal
+amount of memory while you're debugging memory leaks with libgc.
+
+
+
+  ------------------------------------------------------------------------
+APRS(tm) is a Trademark of Bob Bruninga
+
+Copyright (C) 1999 Frank Giannandrea
+Copyright (C) 2000-2012 The Xastir Group
+

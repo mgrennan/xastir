@@ -1,0 +1,69 @@
+# $Id: tnc-startup.d700,v 1.14 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2004-2012  The Xastir Group
+#
+# TNC Init file for KENWOOD D700.  Also reported to work with the
+# Alinco DR-135TP radio (with the EJ-41U TNC which also uses a Tasco
+# TNC just like the Kenwoods).  Perhaps works with the Alinco DR-635
+# radio (with the EJ-50U TNC) too.
+#
+# NOTE:  TXD on a D700A is fixed at 500ms (1/2 second) in "APRS"
+# mode.  In "packet" mode we can change the txd to other values.
+#
+#
+#Don't send CONTROL-C before this line
+##META <no-ctrl-c>
+TC 1
+##Pause for one second
+##META <delay>
+##META <delay>
+#Put the TNC in packet mode since this is where we want to end up
+# Change the 1 to 0 to go to normal radio mode
+##META <no-ctrl-c>
+TNC 2
+# Pause for two seconds
+##META <delay>
+##META <delay>
+##META <delay>
+##META <delay>
+# Enable 4800 baud GPS
+# Change to 2 for 9600 baud GPS
+# Disable both the META line and the GU line for no change
+##META <no-ctrl-c>
+GU 1
+# Pause for two seconds
+##META <delay>
+##META <delay>
+##META <delay>
+##META <delay>
+#Turn off Terminal Control
+##META <no-ctrl-c>
+TC 0
+# Pause for two seconds just in case
+##META <delay>
+##META <delay>
+##META <delay>
+##META <delay>
+HID off
+#CWID off
+AWlen 8
+BBSMsgs ON
+B E 0
+LOC E 0
+Echo off
+FLow off
+AUTOLF off
+MCOM off
+MON ON
+MRPt on
+PACLen 128
+PASSALL off
+HBAUD 1200
+TXDELAY 25
+HEADERLN off
+# Delete following lines if without GPS
+GBAUD 4800
+GPSTEXT $GPRMC
+LTMH OFF
+LTM 10
+#

@@ -1,0 +1,106 @@
+# $Id: tgrlpt.dbfawk,v 1.15 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2003-2012  The Xastir Group
+#
+# This dbfawk file is used to map arbitrary dbf data that accompanies
+# a shapefile into Xastir canoncical values of:
+#   key     - search key
+#   lanes   - width of feature (usually a road but applies to rivers, etc. too)
+#   color   - color to draw the road
+#   name    - name of the road for labels
+#   filled  - whether a polygon is drawn filled or not
+#   pattern - line pattern for road, river, etc.
+#   display_level - highest zoom level at which to display the feature
+#   label_level - highest zoom level at which to display the label
+#   symbol  - 3 char 'TIO': table, ID, overlay
+# NOTE: This file format is modeled after awk but is nowhere near awk
+#  compatible.
+#
+# This file is used to map US Census Tiger/Line "lpt" landmark point shapefiles which are
+# named tgrSSCCClpt.dbf, where SSCCC are the FIPS state and county codes.
+
+# BEGIN is called once per dbf file which contains multiple records.
+BEGIN {
+# dbfinfo is the "signature" of the dbf file listing the column names in order.
+# dbfinfo should match the dbf file that we say this dbfawk file goes with.
+dbfinfo="ID:CFCC:NAME";
+# dbffields is which of the above fields we actually want to look at.
+# No point reading dbffields that are not looked at further.
+dbffields="CFCC:NAME";
+}
+
+# BEGIN_RECORD is called once per dbf record which contains multiple fields.
+# Use this rule to re-initialize variables between records.
+# use color 11 to highlight stuff that isn't properly mapped.
+BEGIN_RECORD {key=""; lanes=1; color=11; name=""; filled=0; pattern=0; display_level=8192; label_level=32; label_color=8; font_size=2; symbol=""}
+
+# per-field rules are applied to the dbffields that are read from each record.
+# key: set the search key to be the Tiger/Line ID.  Not currently used.
+/^NAME=(.*)$/ {name="$1"; next}
+# Census Feature Class Codes are used to set lanes, color, display_level, etc.
+# D: landmarks
+# D00 - unknown
+# D10 - military installation
+# D20 - multihousehold or transient quarters
+# D21 - apartment building or complex
+# D22 - rooming or boarding house
+# D23 - trailer cour or mobile home park
+# D24 - marina
+# D25 - crew-of-vessel area
+# D26 - housing facility for workers
+# D27 - hotel, motel, resort, spa, YMCA, YWCA
+# D28 - campground
+# D29 - shelter or mission
+# D30 - custodial facility
+# D31 - hospital
+# D32 - halfway house
+# D33 - nursing home
+# D34 - county home or poor farm
+# D35 - orphanage
+# D36 - jail 
+# D37 - federal penetentiary, state prison, or prison farm
+# D40 - unknown educational or religious
+# D41 - sorority or fraternity
+# D42 - convent or monastery
+# D43 - educational institution
+# D44 - religious institution
+# D50 - transportation terminal
+# D51 - airport
+# D52 - train station
+# D53 - bus terminal
+# D54 - marine terminal
+# D55 - seaplane anchorage
+# D70 - tower
+# D71 - lookout tower
+# D80 - open space
+# D81 - golf course
+# D82 - cemetery
+# D83 - national park
+# D84 - national forest
+# D85 - state or local park or forest
+# D90 - special purpose landmark
+# D91 - post office box-only ZIP Code location
+# D92 - urbanizacion (Puerto Rico)
+
+/^CFCC=D28/ {color=10; symbol="/] "; next}
+/^CFCC=D28/ {color=10; symbol="/\; "; next}
+/^CFCC=D31/ {color=9; symbol="/h "; next}
+/^CFCC=D40/ {color=5; next}
+/^CFCC=D41/ {color=2; next}
+/^CFCC=D42/ {color=1; next}
+/^CFCC=D43/ {color=2; symbol="/K "; next}
+/^CFCC=D44/ {color=1; next}
+/^CFCC=D51/ {color=14; symbol="/' "; next}
+/^CFCC=D52/ {color=14; symbol="/= "; next}
+/^CFCC=D53/ {color=14; symbol="/U "; next}
+/^CFCC=D54/ {color=1; symbol="/s "; next}
+/^CFCC=D70/ {color=1; symbol="/r "; next}
+/^CFCC=D8/ {color=2; next}
+
+# X<t><s><o> - APRS extension to get all the various APRS symbols.  
+# Useful for home made maps.  Perhaps I shouldn't overload tiger/line
+# stuff with this and just define a new .dbfawk....
+# <t><s><o> are table, symbol, and overlay,
+
+/^CFCC=X(.*)$/ {symbol="$1"; next}
+

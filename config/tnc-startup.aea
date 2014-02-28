@@ -1,0 +1,47 @@
+# $Id: tnc-startup.aea,v 1.19 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2000-2012  The Xastir Group
+#
+# This is the TNC Startup file for AEA TNC's.
+# lines that begin with a pound sign are comments.
+#
+# This has not been tweaked yet to be specific to AEA's.
+# Please modify it and send the patches to the mailing lists.
+# Thanks.
+#
+HID on
+#CWID off
+EXP on
+ECHO off
+#
+# Important!  Only uncomment if really needed as a fill-in digi:
+#MYAlias WIDE1-1
+#
+B E 0
+DIGI on
+FLow off
+FUll off
+HEA off
+#LFadd off
+#LFSup ON
+#AUTOLF off
+#MCOM off
+MFILTER 0
+MON ON
+#
+# Important!  Only monitor PID 0xf0 packets:
+MPROTO OFF
+#
+#MResp OFF
+MRPt on
+MSTamp off
+MXMit off
+NEWmode off
+#PACLen 128
+PASSALL off
+#SCR 0
+# B E 0 must be set to 0 or both APRS and your TNC will send BCNS
+# Which will alternate in everyones L and A lists and fill up
+# their logs.  Do NOT set B E to anything other than 0 while APRS
+# is running.
+

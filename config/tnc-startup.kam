@@ -1,0 +1,43 @@
+# $Id: tnc-startup.kam,v 1.19 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2000-2012  The Xastir Group
+#
+# This is the TNC Startup file for a Kantronics KAM TNC. 
+# lines that begin with a pound sign are comments.
+# Edit this file for your tnc!
+#
+# Important!  Only uncomment if really needed as a fill-in digi:
+#myalias WIDE1-1
+#
+INTF TERM
+#One KAM user reports this command does not exist on his KAM
+#txu on
+xflow off
+MONITOR ON
+MSTAMP OFF
+HEADERLN OFF
+#One KAM user reports this command does not exist on his KAM
+#SCREENLN 0
+AUTOLF OFF
+LFADD OFF
+CD SOFT
+MCOM OFF/OFF
+MCON OFF
+FILT OFF
+AUTOCR 0
+BEACON EVERY 0
+BT %
+BUDL OFF/OFF
+CMS DISC
+CONL OFF
+CT APRS Network no connected messages supported!
+ECHO OFF
+FLOW OFF
+HID OFF/OFF
+#CWID EVERY 0
+MSTAMP OFF
+PASSALL OFF
+#
+# Important!  Monitor only PID 0xf0 packets:
+PID OFF
+

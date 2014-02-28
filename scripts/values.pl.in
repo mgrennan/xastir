@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+$prefix="@prefix@";
+
+=include for usage
+use File::Basename;
+$dirname=dirname($0);
+require ($dirname."/values.pl");
+

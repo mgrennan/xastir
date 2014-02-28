@@ -1,0 +1,1270 @@
+                  Xastir Frequently Asked Questions
+
+$Id: FAQ,v 1.89 2012/11/01 18:57:18 we7u Exp $
+
+The latest version of this FAQ is always available from the Xastir
+project's CVS repository on SourceForge, at
+<http://xastir.cvs.sourceforge.net/xastir/xastir/FAQ?&view=auto>.
+
+The Questions
+-------------
+
+1.  Background
+
+    1.1 What is Xastir?
+    1.2 How and why was Xastir created?
+    1.3 Why the name "Xastir"?
+    1.4 OK, so how does Xastir compare to other APRS(tm) clients?
+    1.5 How thoroughly tested is Xastir?
+    1.6 Whom do I contact for support?
+    1.7 Where can I submit Bug reports or feature requests?
+    1.8 Is there any more information on Xastir?
+    1.9 Where can I get Xastir?
+
+2.  General Technical Questions
+
+    2.1 "Why can't I...? Why won't...work?" What to do in case of problems
+    2.2 How do I submit a patch to the Xastir Development Group?
+    2.3 What's the best hardware/operating system/...
+    2.4 Why isn't there a binary for my platform?
+
+3.  Building Xastir
+
+    3.1  Why do I get error messages when running "bootstrap.sh"?
+    3.1a  Why do I get strange warnings when I run bootstrap.sh?
+    3.2 Why won't Xastir compile with my system's cc?
+    3.3 I'm using gcc and I get some compilation errors, what is wrong?
+    3.4 The linking stage is failing because it isn't linking in the
+        freetype library.  What to do?
+    3.5 During the linking stage, it's giving me "undefined reference to
+        `CompressImageColormap'".  What to do?
+    3.6 Some of the text looks strange, writes over itself and other
+        user interface weirdness occurs.  Why?
+    3.7 Why isn't ImageMagick recognized and used during Xastir's
+        "configure" stage?
+    3.8 Why do I get an error now when trying to do a "cvs update"?
+    3.9 Why does compilation of map_geo, map_WMS or map_tiger fail with "invalid operands to binary <<" errors?
+
+4.  Running Xastir
+
+    4.1 Why do I get wrong texts in menus or other places when using a
+        non-English language file?
+    4.2 I run Xastir under Linux, and I get an error about loading a shared
+        library.
+    4.3 I run Xastir under Linux, and try to set up an ax25 device, but get a
+        "Hard Fail" error on the interface. There is a "permission denied" error
+        in the terminal from which I started Xastir.
+    4.4 I run Xastir, and get on the air, but nobody else sees me on their screens.
+    4.5 I run Xastir, and get on the air, but none of the other stations
+        appear on my screen?
+    4.6 Who is this APX190 guy who all my stuff is getting sent to? Who are these
+        RELAY, WIDE and TRACE people digipeating packets, and why are they putting
+        different callsigns in the fields where their names used to be? Why
+        doesn't anyone answer me when I connect to them? HELP!!!
+    4.7 When weather alerts come in, the counties on my map don't highlight.
+    4.8 I have geoTIFF support compiled and working, but when I select a map, it
+        gives me a -38 error converting the datum, and it doesn't display in the
+        right place.
+    4.9 Xastir runs slowly/loads maps slowly.
+    4.10 I installed a new version of lesstif, but the help menu shows the old
+         version.
+    4.11 Why does Xastir seg-fault sometimes when indexing or loading
+         geoTIFF images?
+    4.12 Why doesn't Xastir run on RedHat 9.0 properly?
+    4.13 Why do I see "Character '\55' not supported in font"?
+    4.14 Why do I see strong blue tinting for the maps?
+    4.15 My config file got munged.  How do I recover?
+    4.16 Why can't I set my position in Xastir correctly?
+    4.17 Why do I get black map images when I use ImageMagick?
+    4.18 Why does my MacOSX machine w/USB->Serial adapters hang?
+    4.19 Why do NumLock/ScrollLock/CapsLock interfere with mouse/keyboard operation?
+    4.20 How to I redirect serial ports from one computer to another?
+    4.21 I have Festival compiled in, but I can't get any speech, why?
+    4.22 ImageMagick gives me: "no decode delegate", why?
+    4.23 How do I get through an http proxy server with Xastir in
+         order to fetch maps?
+    4.24 Can I run multiple copies of Xastir at once?
+    4.25 Why doesn't Terraserver work for some locations?
+    4.26 Some station or config settings are not getting saved, why?
+    4.27 Why are my colors messed up when running via VNC?
+    4.28 Why are the labels missing in the Configure->Timing dialog?
+    4.29 Xastir can't find "xastir.rgb" or some other file.  What's wrong?
+    4.30 Why can't I see station trails as stations move around?
+    4.31 Why don't the maps I installed show up in the Map Chooser?
+    4.32 Dialogs are tiny bullet-shaped windows with no handles.  Why?
+    4.33 Fedora 12 right-click menus don't work.
+    4.34 What about using Xastir with a TNC-X with built-in USB on a Mac?
+    4.35 Why do I get "Bitmap not found? /usr/share/xastir/symbols/2x2.xbm"
+
+5.  Features
+
+    5.1  Why doesn't Xastir include <insert your feature here>?
+
+    5.2  Why doesn't Xastir digipeat packets sent to the RELAY or
+         WIDE1-1 aliases?
+
+    5.3  How do I take a snapshot of my current view? 
+
+    5.4  What is that yellow circle on my map?
+
+    5.5 How can I restart Xastir remotely/from a script/command-line?
+
+
+The Answers
+-----------
+
+1. Background
+
+    1.1 What is Xastir?
+
+
+    Xastir is an APRS(tm) client program that uses amateur radio and Internet
+    services to convey GPS mapping, weather, and positional data in a graphical
+    application.  It has been developed by and for amateur radio enthusiasts to
+    provide real-time data in an easy to use package.
+
+    1.2 How and why was Xastir created?
+
+    There were already several APRS(tm) client programs available to the
+    Mac/DOS world when Frank Giannandrea, KC2GJS decided to develop
+    a Unix client using X Window's and the Motif/LessTiff widget set.
+    From its meager beginnings, Xastir is now a very robust client that
+    meets the needs of the Ham community.
+
+    1.3  Why the name Xastir?
+
+    Xastir is an acronym for X Amateur Station Tracking and Information
+    Reporting.  Besides it sounds much cooler that those other names ;)
+
+    1.4 OK, so how does Xastir compare to other APRS(tm) clients?
+
+    Being actively developed by and for Hams, Xastir is constantly being
+    improved upon to reflect the changing state of APRS(tm).  Xastir has
+    all the functionality you would find in any other APRS(tm) client,
+    from any OS, and quite possibly some unique features.
+
+    1.5 How thoroughly tested is Xastir?
+
+    Xastir is currently in use by hundreds of Hams from around the world.
+    The Xastir Group maintains rigorous standards before releasing new
+    versions of our client.  When bugs do show up, we release patches and
+    new versions as soon as they are available.
+
+    1.6 Whom do I contact for support?
+
+    This FAQ may answer many of users frequent questions.  However, there are
+    two active mailing lists that users could use to help answer any other
+    questions.  Both mailing list are by subscription only and can be accessed
+    through the Xastir web-site.  See the top of this document for the
+    addresses.  You must be subscribed in order to post messages.
+
+    1.7 Where can I submit Bug reports or feature requests?
+
+    The mailing lists are a good place to bring up bugs or feature requests.
+    Note that you must be subscribed in order to post messages.  See above.
+
+    Another good place to document the request or bug in a more permanent
+    manner is the sourceforge tracker. There are separate bug and feature
+    request trackers, both listed at the Xastir project page,
+    http://sourceforge.net/projects/xastir/
+
+    1.8 Is there any more information on Xastir?
+
+    See the main Xastir web-site for more information.  See the top of
+    this document for the addresses.
+
+    1.9 Where can I get Xastir?
+
+    Source code and binaries for several popular Linux distributions is
+    available through the Xastir web-site
+
+
+2. General Technical Questions
+
+    2.1 "Why can't I...? Why won't... work?" What to do in case of
+        problems.
+
+    If are having trouble running the Xastir software:
+
+        1.  Check the FAQ!
+
+            The latest version of the Xastir FAQ can be found on the
+            Xastir web-site.  See the top of this document for the
+            addresses.
+
+        2.  Ask on the "xastir" mailing list.
+
+            Many Xastir users and developers can be found roaming its
+            virtual halls, so it is suggested that you seek wisdom there.
+            The chances are good that you'll get your question answered
+            there.  You must be subscribed in order to post messages.
+
+    2.2 How do I submit a patch to the Xastir Development Group?
+
+    The Xastir Development Group encourages patches from outside developers.
+    There are two main "types" of patches: small bug fixes and general
+    improvements.  Improvements, modifications, and additions should
+    follow the instructions below:
+
+    In general, the first course of action is to be a member of the
+    "xastir-dev" mailing list. This indicates to the Group that you are
+    closely following the latest developments. Your patch file should be
+    generated using either 'diff -c' or 'diff -u' against the latest CVS
+    tree. To submit your patch, send email to the "xastir-dev" mailing list
+    with a Subject: line that starts with [PATCH] and includes a general
+    description of the patch. In the body of the message, the patch should be
+    clearly described and then included at the end of the message. If the
+    patch-file is long, you can note a URL to file itself. Use of MIME
+    enclosures/attachments should be avoided.
+
+    Be prepared to respond to any questions about your patches and possibly
+    defend your code. If your patch results in a lot of discussion, you
+    may be asked to submit an updated patch that incorporates all changes and
+    suggestions.
+
+    2.3 What's the best hardware/operating system?
+
+    Anything that works for "you".
+
+    2.4 Why isn't there a binary for my platform?
+
+    The developers make sure that the software builds and works correctly on
+    the platforms available to them; this does not necessarily mean that
+    your platform is one of them. In addition, the Xastir Project is primarily
+    source oriented, meaning that the distributing valid and build-able source
+    code is the purpose of a release, not making sure that there is a binary
+    package for all of the supported platforms.
+
+    
+3. Building Xastir
+
+    3.1  Why do I get error messages when running "bootstrap.sh"?
+
+    The xastir build procedure requires automake 1.6.3 or later and 
+    autoconf 2.53 or later.  Using anything older than those will 
+    not work.  
+
+    To be very sure of what version of autoconf and automake you're using
+    please examine the output of "automake --version" and "autoconf --version"
+    Do not trust your system's package management software to tell you what
+    version is installed.  Some systems install more than one different 
+    version of autoconf/automake and you can't be sure which one you're using
+    unless you look at the actual version number reported by the tools
+    themselves.
+
+    Worse still, some systems install multiple versions of autoconf
+    and automake and name them in ways that confuses everything 
+    (e.g. "automake19" or "autoconf253").  If that's the case on your system,
+    you could either edit bootstrap.sh by hand to force it to find the right
+    ones (adding paths or suffixes or whatever it takes), or you could just
+    end-run the process and download the source code for a suitable version
+    of automake and autoconf from www.gnu.org, use "--prefix=" options when 
+    configuring both of them, build them, and install them into
+    someplace your system won't care about.  For example, assuming you've 
+    untar'ed, say automake-1.6.3 and autoconf-2.57 into the current
+    directory, and that xastir lives in your directory as /home/me/src/xastir:
+       cd automake-1.6.3
+       ./configure --prefix=/home/me/src/xastir
+       make install
+       cd ../autoconf-2.57        
+       ./configure --prefix=/home/me/src/xastir
+       make install
+       cd /home/me/src/xastir
+       export PATH=/home/me/src/xastir/bin:$PATH
+       ./bootstrap.sh
+
+    This will completely bypass any odd version of automake and autoconf that
+    your system might use, and will insulate you from incompatible changes
+    in those installed tools if you upgrade your OS.
+
+    3.1a  Why do I get strange warnings when I run bootstrap.sh
+
+    The various configure.ac, acinclude.m4, and Makefile.am files that are used
+    by Xastir's autoconf'd build process were designed for automake 1.6.3
+    and autoconf 2.53.  Using a much more recent version than those could 
+    result in warning messages because the tools aren't strictly backward 
+    compatible.  Most of these warnings are harmless.
+
+    3.2. Why won't Xastir compile with my system's cc?
+
+    If Xastir won't compile on your system, it is probably due to
+    one of the following causes:
+
+    - The configure script doesn't recognize your system environment.
+
+      This might be either because it's completely unknown or because
+      the specific environment (include files, OS version, etc) isn't
+      explicitly handled. If this happens, you may need to port the
+      software to your OS yourself.
+
+    - Your systems C compiler is garbage.
+
+      Some operating systems include a default C compiler that is either
+      not ANSI C-compliant or suffers from other deficiencies. The
+      usual recommendation in cases like this is to acquire, install,
+      and use gcc.
+
+    - Your include files may be confused.
+
+      In some cases, we have found that a compiler installation or system
+      upgrade has left the C header files in an inconsistent state. Make
+      sure that your include directory tree is in sync with the compiler
+      and operating system.
+
+    - You haven't installed all the necessary libraries and include files.
+
+      Xastir depends on at least the X, and Motif or LessTif include files.
+      Be sure these are installed before trying to compile the application.
+      Many Linux distributions name these packages <packagename>-dev or
+      <packagename>-devel.
+      NOTE: If you installed ImageMagick from a binary distribution, it will be
+      dependent on the shared libraries for the various graphics formats
+      installed on system on which it was compiled. Be sure you have these same
+      libraries installed, or you'll get a link error.
+      NOTE: The ImageMagick-devel package included with RedHat 8 is missing
+      some files needed for Xastir. The version in the beta directory on
+      RedHat's ftp site works.
+
+      A message like "*** Cannot find Motif include files" either means that 
+      you are missing the development package for Motif/OpenMotif/Lesstif, or 
+      that it is installed in a place where configure can't find it.  It is
+      recommended that you use Motif or OpenMotif instead of Lesstif, as you'll
+      have few problems with those libraries.  For SuSE 9.0, install the
+      "openmotif-libs", "openmotif-devel", and "openmotif" packages.  Other
+      distributions have similar naming.  If you have the Motif libraries and
+      headers installed in a place where Xastir doesn't look for them, see 
+      the references to the "--with-motif-includes" and 
+      "--with-motif-libraries" configure options in the INSTALL file.
+
+    - Your operating system or compiler may be out of version.
+
+      Software vendors issue new releases for a reason; sometimes to add
+      functionality, but more often to fix bugs that have been
+      discovered. Try upgrading your compiler and/or your operating
+      system.
+
+    3.3 I'm using gcc and I get some compilation errors, what is wrong?
+
+    GCC parses your system header files and produces a modified subset which
+    it uses for compiling. This behavior ties GCC tightly to the version of
+    your operating system. So, for example, if you were running IRIX 5.3 when
+    you built GCC and then upgrade to IRIX 6.2 later, you will have to
+    rebuild GCC. Similarly for Solaris 2.4, 2.5, or 2.5.1 when you upgrade
+    to 2.6. Sometimes you can type "gcc -v" and it will tell you the version
+    of the operating system it was built against.
+
+    If you fail to do this, then it is very likely that Xastir will fail to
+    build. One of the most common errors is with readv, writev, or uio.h.
+    This is not a bug with Xastir. You will need to re-install GCC.
+
+    3.4 The linking stage is failing because it isn't linking in the
+        freetype library.  What to do?
+
+    This is, yet again, an ImageMagick problem.  ImageMagick as
+    installed on some systems needs this library linked in.  The
+    "Magick-config" script is supposed to supply a list of all of the
+    libraries that ImageMagick needs, but evidently they forgot one.
+    To get around this problem, you can add "-lfreetype" to the link
+    line to get the compile to complete.
+
+    3.5 During the linking stage, it's giving me "undefined reference to
+        `CompressImageColormap'".  What to do?
+
+    This is, yet again, an ImageMagick problem.  ImageMagick decided to change
+    their API on us again.  Newer releases of Xastir work around this problem
+    by checking the version of ImageMagick you have and changing the function
+    call to match.
+
+    3.6 Some of the text looks strange, writes over itself and other
+        user interface weirdness occurs.  Why?
+
+    This has been seen to occur due to bugs in some versions of LessTif.
+    You may want to try OpenMotif instead if it is available for your
+    distribution.  One caveat that was found on Slackware 8.1 is the need
+    to delete all the text in the /usr/X11R6/lib/X11/config/host.def file
+    otherwise it still refers to the LessTif installation.
+
+    3.7 Why isn't ImageMagick recognized and used during Xastir's
+        "configure" stage?
+
+    You might have forgotten to install both ImageMagick and the
+    ImageMagick-devel RPM.  Another possibility is that your particular RPM's
+    might not contain all of the library dependencies that you need, like
+    libcms or zlib.  Check carefully through "config.log" to see if the
+    ImageMagick detection code says something like:  "ld: cannot find -llcms",
+    "ld: cannot find -lz", or "ld: cannot find -ljpeg".  Install the additional
+    libraries that it needs, and perhaps development packages for them as well.
+    NOTE:  If the "spec" file for the ImageMagick/ImageMagick-devel RPM's had
+    the proper dependencies listed, you would have been asked to install all of
+    the dependent libraries before you could have even installed the
+    ImageMagick RPM's.  Encourage your vendor to fix the "spec" files for those
+    RPM's to include all dependencies.
+
+    3.8 Why do I get an error now when trying to do a "cvs update"?
+
+    SourceForge changed things around a bit on Apr 29th, 2004.  The changes
+    they made broke CVS for everyone.  The error message you get may look like
+    the following:
+
+        "Unknown host: cvs.xastir.sf.org"
+
+    Luckily the fix is simple.  Run these commands from the top directory where
+    you have the Xastir sources:
+
+    find -name Root -path \*CVS\* -exec perl -pi.bak -e's/cvs.xastir.sf.net/cvs.sf.net/' \{\} \;
+    find -name Root -path \*CVS\* -exec perl -pi.bak -e's/cvs.xastir.sourceforge.net/cvs.sf.net/' \{\} \;
+
+    Okay, are we having fun yet?  They changed things again for us
+    on May 12, 2006.  We now want this as the name of the CVS server
+    in the CVS/Root files:   "xastir.cvs.sourceforge.net", so the perl command
+    to use after that date has become:
+
+    find -name Root -path \*CVS\* -exec perl -pi.bak -e's/cvs.sf.net/xastir.cvs.sourceforge.net/' \{\} \;
+
+
+   3.9 Why does compilation of map_geo, map_WMS or map_tiger fail with "invalid operands to binary <<" errors?
+
+   This is a problem with ImageMagick.  In short, your ImageMagick
+   installation has been built with an option incompatible with
+   Xastir.
+
+   New versions of ImageMagick include experimental support for High
+   Dynamic Range Images (HDRI).  This support changes the data type of
+   a Quantum (pixel value) from an 8- or 16-bit integer quantity to a
+   floating point.  Xastir assumes that all pixel values are integer
+   types, and uses operations on those values based on that
+   assumption.  
+
+   You have two choices for getting around this issue: rebuild
+   ImageMagick without HDRI support, or use GraphicsMagick instead.
+
+4. Running Xastir
+
+    4.1 Why do I get wrong texts in menus or other places when using a
+        non-English language file?
+
+    The development is done mainly with the English language file, so
+    other languages may not be up to date.
+
+    Those texts like IC>PULDNMBC02 are placeholders for missing entries
+    in the language file. You can add the local meaning of that string
+    in the English language file to your language file. And send it to
+    the Xastir development team...
+
+    4.2 I run Xastir under Linux, and I get an error about loading a shared
+        library.
+
+    Xastir uses many shared libraries, including lesstif, and perhaps libax25,
+    libproj, libtiff, libgeotiff, libz, libjpeg, etc. These errors indicate
+    ld.so, the Linux dynamic linker, can't find the shared libraries.
+    * First, check that all the libraries are installed. Check the INSTALL
+    file for the locations to get these libraries if you've accidently removed
+    one of them.
+    * Run "ldd /usr/local/bin/xastir".  This will print out a list of libraries
+    that Xastir is looking for and the locations they are expected to be at.
+    * Check that the locations of the libraries are in /etc/ld.so.conf. This
+    should probably be set up by your Linux distribution, but if you've
+    added new library directories after install, you'll need to add them here.
+    This is most applicable to lesstif which installs its libraries in
+    non-standard locations. Read the lesstif installation instructions for
+    more information on this. (Very recent versions create symlinks in
+    /usr/local/lib, so you probably won't need to do anything aside from
+    running ldconfig.)
+    * If you had a libc5 system and hand upgraded it to libc6, and are
+    attempting to link against both libc5 and libc6 built libraries at once,
+    stop now and recompile all your libraries against libc6. The dynamic
+    linkers are different for libc5 and libc6 programs, and linking against
+    libraries built with both versions is bound to cause trouble. This setup
+    has caused many people lots of headaches. Just upgrade your distribution.
+
+    4.3  I run Xastir under Linux, and try to set up an ax25 device, but get a
+         "Hard Fail" error on the interface. There is a "permission denied"
+         error in the terminal from which I started Xastir.
+
+    As mentioned in INSTALL and helpfile, Xastir must be setuid root to use
+    Linux ax25. This is required because Xastir needs the ability to edit its
+    source callsign, and use other advanced options that the Linux ax25 stack
+    restricts to root.
+
+    4.4 I run Xastir, and get on the air, but nobody else sees me on their
+        screens.
+
+    From a software standpoint, check that you have transmitting enabled
+    on your interface, and that the disable transmission "all" and "my
+    position" options in the Interfaces menu are not enabled. Check that ALTNET
+    support in File|Configure|Defaults isn't enabled.
+
+    Also check that your digipeater path is set reasonably; other
+    hams in your area could probably help with this, as the exact settings
+    depend on your setup and on your area's network. The other possibilities
+    are hardware problems: Is the output level on your TNC or soundcard
+    correct? Is PTT on your radio getting triggered? Is your TXdelay set
+    reasonably? All of these possibilities are beyond the scope of this FAQ.
+    An easy way to determine if your hardware works correctly is to try it on
+    conventional packet.
+
+    4.5 I run Xastir, and get on the air, but none of the other stations
+        appear on my screen?
+
+    Did you set up your TNC startup files correctly to remove any extra data
+    from the packet headers? Are you using the correct startup file?  See
+    INSTALL.
+
+    Check that the Display Incoming Data windows is actually showing
+    data coming in.  If not, check your radio's volume/squelch
+    levels and your cabling, both between the radio/TNC and between
+    the TNC/Computer.
+
+    Check that ALTNET support in File|Configure|Defaults is disabled.
+    If activated, it only shows stations transmitting TO the callsign
+    listed in the box.  I sometimes set it to APX or APX190 in order to
+    see who's running Xastir/who's running the _latest_ Xastir.  Set
+    it to "WEIRD" and you'll only see those transmitting to "WEIRD".
+
+    Check all of your Stations|Filter Data and Stations|Filter Display
+    settings. "Select Stations" and "Display Symbols" must be selected.
+
+    If you are using an older version of Xastir, Qxx packets are considered
+    invalid. This is a newer addition to APRS(tm), and recent Xastir releases
+    decode this correctly.
+
+    4.6 Who is this APX190 guy who all my stuff is getting sent to? Who are
+        these RELAY, WIDE and TRACE people digipeating packets, and why are
+        they putting different callsigns in the fields where their names used
+        to be? Why doesn't anyone answer me when I connect to them? HELP!!!
+
+    You must be used to conventional packet. APRS(tm) is inherently different
+    from conventional packet. There are many online resources that explain the
+    basics of APRS(tm), but I'll try to summarize here. APRS(tm) is an
+    unconnected protocol, where you broadcast UI (unnumbered information)
+    packets to the world. Since these packets aren't directed toward a
+    specific user, the TO address of the packet is simply a summary of the
+    software you're running. AP=APRS(tm), X=X Windowing System, 110=Version 1.10.
+
+    RELAY, WIDE, TRACE, WIDEn-N, and TRACEn-N are aliases for generic
+    digipeaters, although all but the WIDEn-N variants are now deprecated
+    (should no longer be used).  Some base stations have their TNC's configured
+    to digipeat with the call of "WIDE1-1" (we used to use "RELAY" for these,
+    but "WIDE1-1" has now taken its place).  Newer digipeater software
+    substitutes their own call for "WIDEn-N" to enable people to see who
+    digipeated them.  See the README.Getting-Started file for a bit more info
+    on paths, including recommended paths for different types of stations.
+
+    To talk to people, you send them messages from within Xastir, you don't
+    "call" them like on typical packet. Most TNC's are set up to ignore classic
+    packet "calls" so you won't get any response. When sending messages to
+    people in your area, do check in their comments that they are people and
+    not stand-alone digipeaters or similar. ;) Thanks to the worldwide APRSserv
+    Internet system, you can send messages to any APRS(tm) user anywhere in the
+    world, provided they're within range of an Igate. Most users are; if your
+    area isn't and you have a 24/7 Internet connection, Xastir can be your
+    area's Igate! (Please check your local laws, as Igating is illegal in some
+    countries!) There are also experimental systems for sending messages via
+    amateur radio satellites, but that is beyond the scope of this FAQ.
+
+
+    4.7 When weather alerts come in, the counties on my map don't highlight.
+
+    First of all, did you download and install the new shapefile weather maps
+    as described in the INSTALL file? (Running scripts/get-NWSdata automates
+    this somewhat for you now)
+
+    Did you compile with shapefile support?
+
+    Check that Map|Enable Weather Alerts is enabled, and "Map|Disable All Maps"
+    is _not_ selected .
+
+    4.8 I have geoTIFF support compiled and working, but when I select a map,
+        it gives me a -38 error converting the datum, and it doesn't display in
+        the right place.
+
+    Did you install libgeotiff before libproj? This error you'll see if you
+    ignored the note in the INSTALL file about this. Recompile libgeotiff and
+    the problem should vanish.
+    If this is not the case, check the datum of the geoTIFF file, and make
+    sure it is one of the ones supported by Xastir. The listgeo program
+    included with libgeotiff can tell you the datum of a map.
+
+    4.9 Xastir runs slowly/loads maps slowly.
+
+    There are many things that can effect the speed of your Xastir software,
+    including the speed of the computer, the amount of memory available, the
+    number of active interfaces, the complexity/type/number of maps you use,
+    and the options you used to compile Xastir and helper libraries. The
+    developers aren't aware of any specific cases in which there would be
+    performance problems; generally these are limitations of your computer.
+    Xastir, when using only basic maps, runs reasonably on a Pentium 60. If
+    you use higher detail maps, such as the tiger line maps suggested in
+    README.MAPS, you'll need a faster computer to be able to load the maps
+    quickly. Also be sure you have a few Megabytes of memory available for
+    Xastir, because paging to disk decreases speed rapidly. If you have the
+    Internet interface, as well as TNC's and weather stations all active
+    at the same time, you'll see a slowdown on a slower computer. Also, if you
+    compiled Xastir or libax25/libtiff/libgeotiff/etc with debugging (-g),
+    recompile these software without debugging and with optimization ON (-O2).
+
+    4.10 I installed a new version of lesstif, but the help menu shows the old
+         version.
+
+    The help menu shows the version of lesstif that Xastir was compiled with,
+    not necessarily the version you're running now. Assuming you compiled it
+    with the new version, check that the new version is the only copy
+    installed. If you install in /usr/local/LessTif/, the default location,
+    be sure you remove any older version from /usr/LessTif/ or
+    /usr/X11R6/LessTif/, as some distributions use those locations.
+
+    4.11 Why does Xastir seg-fault sometimes when indexing or loading
+         geoTIFF images?
+
+    The geoTIFF code must use an API in the TIFF code that is non-public.
+    Unfortunately this means that the geoTIFF code must know more about TIFF
+    than the normal application using the TIFF library.  If the private TIFF
+    include file included with the geoTIFF code doesn't match your installed
+    version of TIFF, you can run into seg-fault problems.
+
+    Solutions for this include:  1) Installing TIFF from sources, or
+    2) Grabbing the sources for your installed version of TIFF, copying one
+    include file from TIFF into the geoTIFF sources and recompiling/installing
+    geoTIFF.  Either of these solutions will make the geoTIFF code recognize
+    and use the proper structures in TIFF should prevent the seg-faulting.
+
+    In the future we hope that either the geoTIFF code will become part of
+    the TIFF code, or that the private TIFF API will become public.  Either
+    of these changes should fix this problem for good.
+
+    4.12 Why doesn't Xastir run on RedHat 9.0 properly?
+
+    The RH kernels have implemented the new(er) New Posix Threading Library
+    (NPTL) as well as back-ported many of the new bells and whistles set to
+    appear in the 2.6.x kernels.  You might experience a great improvement
+    for apps that are heavily threaded.  NPTL is supposed to be backward
+    compatible but we have seen apps that have had problems.  You can revert
+    back to the older LinuxThreads implementation by setting the environment
+    variable: 
+
+    LD_ASSUME_KERNEL=<kernel-version>
+
+    in a shell before starting the app The following versions are available:
+
+       - 2.4.1 - Linuxthreads with floating stacks
+
+       - 2.2.5 - Linuxthreads without floating stacks
+
+    or, you can disable NPTL altogether for dynamically linked
+    applications by using 'nosysinfo' as a boot time option.
+
+    4.13 Why do I see "Character '\55' not supported in font"?
+
+    This message and similar have to do with localization and OpenMotif/
+    Lesstif.  For most of us this is a benign message and can be ignored.
+    If you simply can't stand it any more set LANG="C" or LANG="en_US".  In
+    RH 9 the default LANG is set to en_US.UTF-8 and this is where the warnings
+    are coming from.
+
+    A quick way to address this on RedHat 8 and 9 is to edit your
+    /etc/sysconfig/i18n config file.  I believe the original file looks
+    like:
+
+    LANG="en_US.UTF-8"
+    SUPPORTED="en_US.UTF-8:en_US:en"
+    SYSFONT="latarcyrheb-sun16"
+
+    Change the "LANG=" line to:
+
+    LANG="en_US"
+
+    and reboot.
+
+    With the original setting you get some weird character mappings.  For
+    example, running "man ls", all of the dashes (-) disappeared from my
+    screen until I changed the LANG setting.
+
+    4.14 Why do I see strong blue tinting for the maps?
+
+    Strong blue (or perhaps other color) tinting of the image may be
+    due to running the display over a Hummingbird eXceed session.
+    Try running it locally and you should see the proper colors.
+    Try changing the eXceed session to use more bits of color.
+
+    4.15 My config file got munged.  How do I recover?
+
+    Xastir saves previous revisions of the config file as
+    "xastir.cnf.1" through "xastir.cnf.3".  Look for them in the
+    ~/.xastir/config directory.  Kill Xastir, then copy one of the
+    backup files to "xastir.cnf" in order to recover your previous
+    settings.  Xastir will use the "xastir.cnf" file the next time
+    it starts up.
+
+    Older Xastir versions saved only one copy of the config file as
+    "xastir.bak".
+
+    4.16 Why can't I set my position in Xastir correctly?
+
+    If your LC_NUMERIC environment variable is set to something other than
+    "C", it can cause commas and periods to be swapped when Xastir tries to
+    read/write files.  We've tried to address this in the latest Xastir code,
+    forcing LC_NUMERIC="C" inside Xastir itself.  Another solution is to type
+    this when starting Xastir (from a BASH shell.  If you use another type of
+    shell, modify the syntax accordingly):
+
+        export LC_NUMERIC="C"; xastir &
+
+    4.17 Why do I get black map images when I use ImageMagick?
+
+    There was a bug in versions of Xastir prior to the CVS version of
+    4 December 2009 that caused this problem if ImageMagick (or
+    GraphicsMagick) were compiled with QuantumDepth not equal to 16
+    (GraphicsMagick now defaults this parameter to 8).  The bug was
+    fixed, and current versions of Xastir should not have this
+    problem.  If you are running an older version than 4 December
+    2009, updating will likely solve this problem for you.
+
+    If you are running a version higher than 1.9.7 or a CVS version
+    checked out after 4 December 2009, then the problem lies
+    elsewhere.  It may be due to bugs in your particular version of
+    ImageMagick, but more likely it's related to the color-depth of
+    your X-Server.  If you are using 8-bit, 24-bit, or 32-bit
+    color-depth: Try 16-bit, which is the color-depth best supported
+    by the Xastir code.
+
+    4.18 Why does my MacOSX machine w/USB->Serial adapters hang?
+
+    Use ports such as /dev/cu.usbserial0 for USB to serial adapters
+    on MacOSX.
+
+    4.19 Why do NumLock/ScrollLock/CapsLock interfere with mouse/keyboard
+         operation?
+
+    Because they are treated as modifiers by Motif.  Here's an FVWM2 document
+    (FVWM2 is a window manager) that talks about it:
+
+    http://www.fvwm.org/documentation/faq/index.php?theme=navigate
+
+    See section 5.5 of that document which talks about these keys.  If you type
+    these commands and then restart your window manager it may take care of
+    your problem, but then those keys will be disabled and you won't be able to
+    use in other applications:
+
+        xmodmap -e "clear Lock"
+        xmodmap -e "clear Mod2"
+        xmodmap -e "clear Mod5"
+
+    4.20 How to I redirect serial ports from one computer to another?
+
+    For Linux, try a program called "remserial". It works as a
+    client/server pair to do exactly what you want.  Google should
+    find it for you.  One user was able to use a spare serial port
+    on his windows box using "remserial" on the Linux computer and a
+    program called "serproxy" on the windows machine. Another one I
+    have to try for windows is comfoolery.  See links below.
+
+    Another option is to use a Perl script on each end to do the
+    conversion.
+
+    Yet another is to use "netcat".  "man nc" or "man netcat" should
+    tell you about it.  It redirects tcpip data seamlessly under
+    Linux.  On SuSE the docs for it are in
+    /usr/share/doc/packages/netcat.  Try a command line like this:
+
+        cat /dev/ttyS0 | nc -l -p 3000
+    or
+        cat /dev/ttyS0 | netcat -l -p 3000
+
+    That should make a listening socket at port 3000 which listens
+    to the /dev/ttyS0 serial port.  "telnet localhost 3000" should
+    show you any data coming in on that serial port.  Connect Xastir
+    across the network to that listening socket to get the data.
+
+    If you want to put your GPS on a remote serial port, use the
+    gpsd daemon to do it.
+
+    if you wish to put your weather station on a remote serial port,
+    investigate using OWW (for Dallas weather stations), wx200d
+    daemon for some Radio Shack/Huger/Oregon Scientific weather
+    stations, or Meteo daemon for Davis weather stations.
+
+    You may also connect to a remote AGWPE instance for using remote
+    TNC's/soundcards.  Note that AGWPE runs only on Windows.
+
+    Yet another which looks to be netcat recoded/extended:  socat
+    
+    Comfoolery:     http://www.brianpoe.com/comfoolery/
+    Serproxy:       http://freshmeat.net/projects/serproxy/
+    Serproxy:       http://www.lspace.nildram.co.uk/freeware.html
+    Remserial:      http://lpccomp.bc.ca/remserial/
+    Socat:          http://www.dest-unreach.org/socat/
+ 
+
+    4.21 I have Festival compiled in, but I can't get any speech, why?
+
+    a) You must start the Festival server daemon before starting Xastir.
+    Start it via this command :
+
+        festival_server &
+
+    b) If the server is running, but you get this: "festival_client:
+    connect to server failed", then you may have some tweaks to do
+    to your system files in order to allow Xastir (or anything else)
+    to connect to Festival.  Try this first to see whether anything
+    can connect to Festival:
+
+        telnet localhost 1314
+
+    If the server is running properly it'll let you connect.  If it
+    does, try typing:
+
+        (SayText "Hello, World")
+
+    If that doesn't work, check your audio mixer settings first, then
+    proceed to c) below:
+
+    c) Some people have an "/etc/hosts" file that has an incorrect
+    line for localhost.  You should have a line which has 127.0.0.1
+    at the start, and has "localhost" somewhere on that line as well.
+    Like this:
+
+        127.0.0.1 localhost localhost.localdomain
+
+    d) On one Debian box, it was an issue with "/etc/hosts.allow".  
+    See "man 8 tcpd" or "man 5 hosts_access" for detailed info about
+    how to configure /etc/hosts.allow and /etc/hosts.deny.  It's
+    part of the tcpwrappers stuff that allows you to configure which
+    hosts have access to which services on your system.
+
+    4.22 ImageMagick gives me: "no decode delegate", why?
+
+    README.win32 has a bit of info about this one, as it most often happens
+    on Win32 systems.  It has been seen on other systems as well though.
+    The short answer is that you may have to set the environment variable
+    "MAGICK_HOME" to the location where the ImageMagick modules reside.
+    This is only necessary if ImageMagick doesn't have the location
+    pre-compiled into it.  The example for Win32 systems is:
+
+        export MAGICK_HOME=/usr
+
+    Added to the ~/.profile file, so that the BASH shell gets this defined
+    each time you log in.  The location "/usr" will probably be different
+    on a non-Windows machine, so change the line above as required for your
+    system.
+
+    4.23 How do I get through an http proxy server with Xastir in
+         order to fetch maps?
+
+    *) Install libcurl and/or wget.
+    *) Set the HTTP_PROXY and FTP_PROXY environment variables in
+       your ~/.profile file.  Libcurl has additional options that
+       can be set:  HTTPS_PROXY, GOPHER_PROXY, and ALL_PROXY.
+    *) Create and fill in the ~/.netrc and/or .wgetrc files with
+       proper values.  Set the permissions on it so that only you
+       can read/write the file:  "chmod 600 .netrc".  Typical
+       contents of the file are shown below:
+
+            http_proxy = http://proxy.yoyodyne.com:18023/
+            ftp_proxy = http://proxy.yoyodyne.com:18023/
+
+    4.24 Can I run multiple copies of Xastir at once?
+
+    Yes, but you must keep the configuration directories separate for
+    each copy by using a command-line flag. Xastir will create the new
+    config directory and fill it with defaults if it doesn't already
+    exist. Here's the method. Substitute your user name where it says
+    "<user>":
+
+        xastir &    # starts up first Xastir copy against ".xastir" directory
+        xastir -c /home/<user>/.xastir2 &    # starts up 2nd Xastir copy against ".xastir2" directory
+        xastir -c /home/<user>/.xastir3 &    # starts up 3rd Xastir copy against ".xastir3" directory
+
+    To make the process easier if you use this method a lot, create
+    aliases by editing your .profile (This assumes you're running BASH
+    or Bourne shells):
+
+        alias xastir2='xastir -c /home/<user>/.xastir2 &'
+        alias xastir3='xastir -c /home/<user>/.xastir3 &'
+
+    After sourcing your new .profile (The command is ". .profile" from
+    your home directory) or logging out and back in again, you can type
+    "xastir2" or "xastir3" as a command to start up the additional
+    copies of Xastir.
+
+    Older methods, may still be useful at times: 
+
+    Do this to allow more than one user to access your X display and to
+    create additional users, each capable of running one Xastir session:
+
+        xhost localhost
+
+    This lets other users on your machine use the X11 display.
+
+    Create another user (or two or three) using whatever facilities
+    your system uses to do this.
+
+        xterm &     # Start up an xterm window in the background
+        su 2nduser. # su to one of your new usernames
+        xastir &    # Start up Xastir as that user, in the background
+
+    Optional:
+    Set up your 1st Xastir instance with the server port enabled.
+    Connect the 2nd instance to localhost:2023.  This way one Xastir
+    will get its feed from the other.
+
+    You can start up a third Xastir in the same manner, starting
+    with the "xterm &" command and then doing "su 3rduser" instead,
+    then "xastir &" as that third username.
+
+    Many Xastir sessions can all get their feed from one Xastir
+    session, or they can be connected to different TNC's or server
+    ports.
+
+    4.25 Why doesn't Terraserver work for some locations?
+
+    Terraserver is based on the UTM coordinate system.  If you're trying
+    to request map images that cross a UTM zone boundary, Terraserver
+    may not work at that location.  Zoom in closer or pan left/right
+    in order to avoid this problem.
+
+    4.26 Some station or config settings are not getting saved, why?
+
+    A few of the menu settings do not get saved.  This is on purpose.
+    If you are having more serious troubles, like for instance your
+    station location setting isn't getting saved between Xastir runs,
+    check your LANG setting (see question 4.13 above).
+
+    4.27 Why are my colors messed up when running via VNC?
+
+    VNC may have a different colormap or colordepth than the system Xastir is
+    running on.  Here is one invocation that a user used which worked.
+    Substitute the appropriate parameters for your system of course:
+
+    vncserver :5 -name melecom -depth 24 -geometry 800x600 -pixelformat rgb565
+
+    4.28 Why are the labels missing in the Configure->Timing dialog?
+
+    Some versions of the Lesstif widget set have this bug.  Try
+    switching to a different version of Lesstif or switch to
+    OpenMotif and you should see the labels again.  So that you can
+    actually operate Xastir, here's what you _should_ have seen:
+
+        On the left:
+        ------------
+        Posit TX Interval (min)
+        Object/Item TX Interval (min)
+        GPS Check Interval (sec)
+        Dead-Reckoning Timeout (min)
+        New Track Time (min)
+        RINO -> Objects Interval (min), 0=Disabled
+        Snapshot Interval (min)
+
+        On the right:
+        -------------
+        Station Ghosting Time (min)
+        Station Clear Time (hours)
+        Station Delete Time (days)
+        Serial Inter-Char Delay (ms)
+        New Track Interval (degrees)
+        Internet Map Timeout (sec)
+
+    A screenshot on the Wiki of this dialog:
+    <http://www.xastir.org/wiki/index.php/Notes:Timing_Slider_Dialog_Screenshot>
+
+    4.29 Xastir can't find "xastir.rgb" or some other file.  What's wrong?
+
+    This could be one of several things.  We'll check them in order:
+
+    a) If you get this exact message:
+
+        "Error! can not find color file: /xastir/config/xastir.rgb"
+
+    Then it could be that you're not getting a variable defined on
+    the compile line.  This text or similar should appear for each
+    file compiled:
+
+        -DXASTIR_DATA_BASE=\"/usr/local/share/xastir\"
+
+    If you're not seeing this, or the variable is defined to an
+    empty string or is otherwise incorrect, you may need to
+    upgrade/downgrade your autoconf or automake packages and rerun
+    the Xastir install starting at the "./bootstrap.sh" stage.
+
+    b) Did you run the "make install" stage as root or using "sudo"
+    after you compiled Xastir?  If not, Xastir couldn't install
+    files it needs to run.
+
+    c) Another possible problem is a corrupt or very old
+    ~/.xastir/config/xastir.cnf file.  Check for this by typing:
+
+        cd
+        mv .xastir .xastir.save
+        xastir
+
+    If it comes up ok this time, then either paths in your config
+    file are incorrect or the config file is corrupt.  If there's no
+    change, go back to your original configuration by typing:
+
+        cd
+        rm -rf .xastir  # NOTE: this will delete ~/.xastir and all contents!
+        mv .xastir.save .xastir
+
+    d) Yet another thing to check is the value in your LANG variable.
+    It should be either "en_US" or "C" for Xastir to read/write
+    config files correctly:
+
+        echo $LANG
+
+    If it is something else, start Xastir like this:
+
+        export LANG=en_US; xastir -geometry -0-0 &
+
+    You can create an alias in your shell for this so that you don't
+    have to remember to type it each time.
+
+    e) Perhaps you're trying to run an old Xastir executable that
+    was compiled with different paths, or you have an LSB-Xastir
+    installed and have compiled or installed Xastir in the normal
+    fashion as well.  Type this to see where the executable is
+    trying to run from:
+
+        which xastir
+    -or-
+        whereis xastir
+
+    f) It's possible that your autoconf/automake packages need to be
+    upgraded or downgraded.  These packages are somewhat version
+    dependent on each other, so it's likely that you'll have to do
+    this upgrade or downgrade as a pair for things to work correctly.
+    After the upgrade or downgrade, recompile Xastir starting at the
+    "./bootstrap.sh" stage so that the configure and Makefile
+    scripts are re-created.
+
+        ./bootstrap.sh
+        ./configure
+        make
+
+    Make sure that you now see a reasonable path for the
+    XASTIR_DATA_BASE variable on each compile line.
+
+    4.30 Why can't I see station trails as stations move around?
+
+    Enable Station->Filter Display->Display Trail
+
+    File->Configure->Timing->"New Track Time" and "New Track Interval
+    should be set above zero.  Defaults for these are 45 and 1
+    respectively.
+
+    If this problem and others occur, such as your latitude/longitude
+    getting lost between runs, this might indicate a problem with
+    your LANG variable.  See question #4.26 above.
+
+    4.31 Why don't the maps I installed show up in the Map Chooser?
+
+    Install the maps in the correct place, normally
+    "/usr/local/share/xastir/maps/" or subdirectories below there. If
+    running LSB-Xastir it's "/opt/Xastir/share/xastir/maps/".
+
+    Make sure the map directories and files have read permissions
+    for the user.
+
+    Select "Map->Configure->Index: Add New Maps", then check in Map
+    Chooser to see if the map is listed.  If not, try the "Reindex
+    ALL Maps" option.
+
+    Verify that you have installed the map libraries necessary to
+    handle the types of maps you're wishing to use: "Help->About".
+    Also you can check the messages written to STDERR in the shell
+    you start Xastir from.
+
+    Check this file to see if map indexing found the file at all.
+    It's the same file that Map Chooser reads to display the map
+    selections:
+
+        ~/.xastir/config/map_index.sys
+
+    If the map is a raster map, you can check whether your installed
+    ImageMagick or GraphicsMagick can display the image.
+
+        For IM:   display <filename>
+        For GM:   gm display <filename>
+
+    If it's an internet-based map you're trying to download/display,
+    verify in the Xterm that you have internet maps enabled using
+    either libcurl or wget.  Check manually whether curl or wget
+    (whichever Xastir is using) can fetch a remote file.  Check
+    whether a file like ~/.xastir/tmp/map.gif or map.jpg shows up
+    after you try to fetch a file, even if Xastir doesn't display
+    it.  See if one of the above "display" commands will display it
+    if so.  Check the File->Configure->Timing dialog for the
+    "Internet Map Timeout" setting: Adjust it upwards if Xastir is
+    timing out fetching the remove map.
+
+    If all else fails, try removing the ~/.xastir directory and all
+    contents.  Warning:  This will cause you to lose all of your
+    personal Xastir configuration, including callsign, location,
+    bookmarks, map levels and other map settings, etc.  Once you've
+    done this, verify that your LANG setting is either "C" or
+    "en_US", with no additional characters in there, then start
+    Xastir from that same shell with the correct LANG setting.
+    Xastir should index all of your maps on startup. After it is
+    complete, bring up the Map Chooser and all available maps should
+    be listed.
+
+    4.32 Dialogs are tiny bullet-shaped windows with no handles.  Why?
+
+    This is caused by an interaction between "Motif" and "compiz".
+    "compiz" is enabled in some versions of Ubuntu Linux with a
+    "Desktop Effects" menu item.  They changed the default to *ON*
+    several releases ago.  "compiz" is a window manager which
+    enables eye-candy effects such as animated window
+    opening/closing, 3-D effects, and so forth.  To fix this
+    problem, turn *OFF* "Desktop Effects" which will disable
+    "compiz" and re-enable the default window manager.
+
+    4.33 Fedora 12 right-click menus don't work.
+
+    This was a Fedora X11 bug and has been fixed.  Do a "yum
+    update" on your system to get the latest Fedora fixes.
+
+    If you're having troubles with another OS, read this thread to
+    get some insight into the problem:
+      https://bugzilla.redhat.com/show_bug.cgi?id=543647
+
+    It appears to be a bug in the X11 server and can affect OpenMotif
+    and Lesstif apps.  I didn't read every comment though.  There were
+    definitely many dead-ends as they went along discussing it.
+
+    4.34 What about using Xastir with a TNC-X with built-in USB on a Mac?
+
+    You will need the device drivers from FTDI, downloadable from their website at
+    http://www.ftdichip.com/Drivers/VCP.htm
+
+    Note: the TNC-X packet datarate is fixed at 1200 baud, however the serial
+    communication with the computer is configurable via internal jumpers. It's
+    been observed that setting the com port to 1200 baud results in a deaf TNC-X.
+    Setting the com port to 9600 baud works well, however. 
+
+    4.35 Why do I get "Bitmap not found? /usr/share/xastir/symbols/2x2.xbm"
+
+    The problem is that you probably have previously installed a binary version 
+    of Xastir from your system's repository --- and Linux packages are set up
+    to install files in /usr (e.g. binaries to /usr/bin, libraries to /usr/lib/,
+    and supporting files to /usr/share).  But CVS xastir, like almost all source
+    packages, installs to /usr/local (/usr/local/bin, /usr/local/lib, 
+    /usr/local/share).  When you de-installed your binary package and installed
+    the source version, it removed the /usr/ stuff and installed the files in
+    /usr/local/.
+
+    Your configuration files for Xastir still point to the old locations, and
+    Xastir is confused because files it's expecting aren't there.
+
+    You have two approaches to fix this:
+
+      1) If you have not used Xastir a lot and don't have a whole lot of 
+         custom configurations (map selections, interface properties, etc.) then
+         you can just move your ~/.xastir/config/xastir.cnf file and let Xastir
+         regenerate a default set-up.  Many people here recommend that approach
+         because it's just a matter of one command:  
+
+            mv  .xastir/config/xastir.cnf  .xastir/config/xastir.cnf_old
+
+         But this will blow away all your customizations, so it might not be the
+         best choice.  Note that you can still glean information from the old
+         copy of the config file to help set up the new.
+
+      2) Change all references to "/usr/" in your configuration files to "/usr/local".
+         Most of these will be in ~/.xastir/config/xastir.cnf so it's just a matter
+         of editing that one file and changing them all.  
+
+    It is always an issue when you switch from a pre-compiled linux package to
+    a source build.
+
+5.  Features
+
+    5.1  Why doesn't Xastir include <insert your feature here>?
+
+    Probably because someone hasn't taken the time to write the feature or
+    enough people have complained loud enough that it wasn't there.  The
+    feature set of Xastir is user/developer driven. So get busy!
+
+    5.2  Why doesn't Xastir digipeat packets sent to the RELAY or
+    WIDE1-1 aliases?
+
+    If you're running serial-port connected TNC's, the "tnc-startup.*"
+    files that get installed in /usr/local/share/xastir/config should set up
+    your TNC to respond to these packets.  Select Interfaces->Properties,
+    then select the interface, click Properties, then select the Setup
+    and Shutdown files at the bottom of that dialog.  When an interface
+    is brought up the Setup file will be downloaded to the TNC.
+    "myalias WIDE1-1" is the command most TNC's accept for defining a
+    digipeating alias.  That command or similar should be in the Setup file
+    that you use.
+
+    Use "myalias WIDE1-1" with the new path scheme discussed on
+    APRSSIG during early April, 2005:  RELAY/WIDE/TRACE/TRACEn-n are
+    deprecated (should not be used).
+
+    If you're running kernel AX.25 interfaces, then you'll need to run
+    another package to handle digipeating on these interfaces, perhaps
+    digi_ned.
+
+
+    5.3  How do I take a snapshot of my current view? 
+
+    You can cause a snapshot to occur by enabling Snapshot in the File menu.
+    It takes a snapshot every five minutes starting immediately when the
+    togglebutton is first enabled.  This means you can change views and
+    disable/enable to take an immediate snapshot each time as well.
+
+    You can also send a "SIGUSR1" signal from another process and Xastir
+    will take a snapshot. The feature was added so that someone could
+    press a button on a web page and cause Xastir to make a new snapshot.
+
+    For Example, from the shell you can do: 
+
+        kill -SIGUSR1 `cat ~/.xastir/xastir.pid`
+
+    Snapshots will are stored under ~/.xastir/tmp/
+
+
+    5.4 What is that yellow circle on my map?
+
+    Somewhere around a half-hour or an hour after you start Xastir with 
+    a connected TNC, you will begin to see a yellow circle surrounding your 
+    station at some zoom levels.  This is your "ALOHA Circle,"
+    the circle containing approximately the number of stations that should 
+    saturate your local APRS channel.  See 
+    http://web.usna.navy.mil/~bruninga/aprs/ALOHAcir.txt for details.
+    The short story is you should set your path so your packets don't
+    travel farther than this circle's radius.  
+
+    This circle is shown when your station is in view and you are
+    zoomed out far enough to contain the circle in the viewport.  Its
+    radius is recalculated once every half an hour from the stations
+    you've heard on RF.  Stations you hear from internet servers or
+    other non-RF sources are not included in the calculation.  The
+    circle can be turned off from the Station->Filter Display menu
+    but it will be enabled again each time you restart Xastir.
+
+    5.5 How can I restart Xastir remotely/from a script/command-line?
+
+    Send a SIGHUP to the process.  This will cause Xastir to save
+    its configs, exit, then restart with the same environment and
+    command-line parameters as it initially had.
+
+    For Example, from the shell you can do: 
+
+        kill -SIGHUP `cat ~/.xastir/xastir.pid`
+
+    NOTE:  This SIGHUP trick doesn't work if you've configured
+    Xastir with profiling ( "./configure --with-profiling" ).
+
+
+----------------------------------------------------------------
+
+APRS(tm) is a Trademark of Bob Bruninga
+
+If you find other problems, or would like to point out other caveats to add to
+this FAQ, please point them out to the developers on the Xastir-dev mailing
+list.  The addresses for the mailing lists may be found on the main Xastir
+web pages, which are listed at the top of this document.  You must be subscribed
+in order to post messages.
+
+
+Copyright (C) 2000-2012 The Xastir Group

@@ -1,0 +1,30 @@
+# $Id: tnc-startup.kpc2,v 1.13 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2004-2012  The Xastir Group
+#
+# This is the TNC Startup file for Kantronics TNC.
+# lines that begin with a pound sign are comments.
+#
+#
+HID off
+#CWID every 0
+B E 0
+DIGI on
+ECho off
+FLow off
+FUll off
+HEA off
+LFadd off
+AUTOLF off
+MCOM off
+MON ON
+MResp OFF
+MRPt on
+MSTamp off
+#
+# Important!  Only uncomment if really needed as a fill-in digi:
+#MYAlias WIDE1-1
+#
+NEWmode off
+SCR 0
+#

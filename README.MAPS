@@ -1,0 +1,1518 @@
+
+$Id: README.MAPS,v 1.106 2012/03/02 20:28:17 we7u Exp $
+
+
+Recommended Configurations for:
+
+  U.S. Users:
+  -----------
+
+    Minimum:  Shapelib, pcre
+    --------
+      Allows use of all built-in map types plus 2003 (and later) Tigermap data,
+      shapefile weather alerts, and local ESRI Shapefile format
+      maps, including U.S. satellite/image/topo maps via Internet.
+
+    Medium:  Shapelib, pcre, lcms, ImageMagick, libcurl/wget,
+    -------
+
+      Allows use of all the above plus Internet maps and local image
+      maps.
+
+    Maximum:  Shapelib, pcre, lcms, ImageMagick, libcurl/wget,
+    --------  libtif, libproj, libgeotiff
+
+      Allows use of all the above plus USGS topo maps.
+
+    Bleeding edge:  GDAL/OGR
+    --------------
+      Adds more map types, but they're not fully supported yet.  You
+      can certainly get some use out of them though, like overlaying
+      SDTS contour vectors on top of terraserver satellite images.
+
+  Rest of World:
+  --------------
+
+    Minimum:  lcms, ImageMagick, libcurl/wget
+    --------
+      Allows use of all built-in map types plus local and Internet
+      image maps, including Canadian topo maps via Internet.
+
+    Medium:  lcms, ImageMagick, libcurl/wget, Shapelib, pcre,
+    -------
+
+      Allows use of all the above plus ESRI Shapefile maps.
+
+    Maximum:  libproj/libtiff/libgeotiff/GDAL/OGR
+    --------
+      Adds more map types.  Some of these may not be useful in your
+      part of the world.  GDAL/OGR stuff is not fully supported yet.
+
+
+Map Type:           Libraries Required/Notes:
+---------------     -------------------------
+DosAPRS             Built-in.
+WinAPRS             Built-in.
+X-APRS              Built-in.
+MacAPRS             Built-in.
+PocketAPRS          Built-in.
+USGS GNIS           Built-in.  Can split into county-sized chunks
+                    using xastir/scripts/split_gnis.pl to speed
+                    things up.
+Address Lookup      Built-in.
+Weather Alerts      Shapelib
+pre-2003 Tigermaps  Shapelib
+post-2003 Tigermaps Shapelib, pcre
+ESRI Shapefiles     Shapelib
+Image Maps          ImageMagick.  Often need lcms library and others
+                    as well (whatever it takes to make ImageMagick
+                    happy).  Can also use the XPM library for some
+                    image types without installing ImageMagick.
+Internet Maps       ImageMagick plus wget or libcurl.  Often need
+                    lcms library and others as well (whatever it
+                    takes to make ImageMagick happy).
+UI-View Maps        Convert from .INF to .GEO format using
+                    xastir/scripts/inf2geo.pl
+OziExplorer Maps    Convert some maps to .GEO format using
+                    xastir/scripts/ozi2geo.pl
+USGS DRG Topo       libtiff, libtiff-devel, libproj, libgeotiff
+USGS SDTS           GDAL/OGR.  Preliminary.
+MapInfo             GDAL/OGR.  Preliminary.
+Tiger/Line Raw      GDAL/OGR.  Preliminary.
+Microstation DGN    GDAL/OGR.  Preliminary.
+S57                 GDAL/OGR.  Preliminary.
+APRS Overlays       Convert to Shapefile maps with scripts/pos2shp.pl
+
+
+The default map, "worldhi.map", is used with permission of its creator, Keith Sproul, WU2Z.
+
+
+How to Use APRS Overlay Maps (*.POS files) within Xastir:
+---------------------------------------------------------
+    Use the "xastir/scripts/pos2shp.pl" script to convert the
+    overlay files to ESRI Shapefile maps:
+
+        # ./pos2shp.pl test.pos testmap
+        # cp testmap* /usr/local/share/xastir/maps/.
+
+    Xastir:  Map->Configure->Index: Add New Maps
+             Map Chooser:  Select the "testmap" map
+
+
+Getting Maps and other Data Files for Xastir:
+---------------------------------------------
+
+      NOTE:  Set map FILES to permissions 644 ("rw-r--r--"), map
+      DIRECTORIES to 755 ("rwxr-xr-x") using the "chmod" command.
+      These permissions will allow anyone on the box to read the map
+      files, and access the map directories. Type these
+      commands exactly as shown in order to set the map directory's
+      permissions properly.  Do this as the root user:
+
+      cd /usr/local/share/xastir/maps
+      find . -type d -exec chmod 755 {} \;
+      find . -type f -exec chmod 644 {} \;
+
+      You can repeat these commands at anytime, to fix up errant map
+      permissions that are created by downloading/installing new
+      maps.
+
+      Currently the maps/GPS directory needs to be writable by normal users
+      in order to support downloading GPS data using GPSMan.  This will be
+      changed at some future date, moving this directory into the user's
+      home directory instead.
+
+      cd /usr/local/share/xastir/maps
+      chmod 777 GPS
+      find GPS -type d -exec chmod 777 {} \;
+      find GPS -type f -exec chmod 777 {} \;
+
+
+
+    Download some maps:
+
+      If you compiled with ImageMagick and have wget or libcurl installed,
+      you can skip this step and use the online Tiger/Terraserver maps
+      exclusively. However, having maps on your computer is often faster
+      than transferring images over a modem, and is not subject to the
+      failures of your Internet connection.  See the section below on map
+      caching for an exciting feature that works with most online maps to
+      really speed things up!
+
+      You can have any number of maps in the /usr/local/share/xastir/maps
+      directory.  You can organize the maps however you like. You can also
+      use symbolic links to link to files/directories on other disks. Map
+      files are loaded in the order that they appear in the chooser unless
+      you adjust the layering priorities in the "Properties" dialog (it's
+      recommended that you use these now instead of a directory hierarchy to
+      choose the layering).
+
+      There are many methods for organizing many maps. Create a map
+      hierarchy using something that makes sense to you. The old method of
+      creating transparent/filled or raster/vector directories has been
+      superceded by the new map layering features in the Map
+      Chooser->Properties dialog. It's now suggested that the map layering
+      be done there, and the directory layout designed to make it easiest
+      for the user to select maps. Perhaps a good start would be:
+
+           World/
+           Canada/
+           Canada/Province/
+           USA/
+           USA/State/WA/
+           USA/State/WA/County/
+           ...
+           GNIS/
+           Overlay/
+
+      Please note that the map directories are entirely up to the user
+      now. Use the map layering facilities (Map Chooser->Properties) to
+      determine the order in which they will be drawn, and to determine
+      which will draw filled areas.  Note that raster maps will always draw
+      filled, not matter what the setting suggests.  For vector maps, you
+      have a choice of:
+
+            Fill = No       Polygons will never be filled
+            Fill = Yes      Polygons will always be filled
+            Fill = Auto     Polygon fill is determined by map (or if it's a
+                            Shapefile, by any associated dbfawk file).
+
+      Map types available by extension:
+
+      Vector Format:
+      .shp/.shx/.dbf  Shapefile vector map (need all three files)
+      .pdb            PocketAPRS vector map
+      .map            APRSdos/WinAPRS/MacAPRS vector map
+      .gnis           GNIS labels file (actually points instead of vectors)
+      .geo            Vector map or Internet vector map.  Note that for
+                      http/ftp-based maps Xastir requires an IMAGESIZE line.
+
+      Raster Format:
+      .tif/.fgd       geoTIFF raster image map
+      .geo            Raster image map or Internet raster image map.  Note that
+                      for http/ftp-based maps Xastir requires an IMAGESIZE line.
+
+      Note:  .geo is listed twice because it can fit in both categories,
+      depending on the base format of the map file that the .geo file
+      points to.  .geo files are handled by the XPM library or by
+      ImageMagick, so most anything that can be handled by those installed
+      libraries can by handled by Xastir.
+
+      A few maps of various types are available from:
+
+        http://wetnet.net/~we7u/xastir/maps/
+
+      Here's a page that we'll try to keep up-to-date which will have lots of
+      links to download-able maps on it:
+
+        http://www.xastir.org/wiki/index.php/Xastir_Maps
+
+     Dos/Win/MacAPRS style vector/fill maps:
+
+      http://www.winaprs.com/Maps.htm
+      http://www.cnunix.com/ftp/hamradio/rutgers.mirror/maps/maps2/
+      ftp://ftp.tapr.org/aprssig/maps/
+
+       WORLDHI.MAP is suggested as a basic view of the world map.
+
+      You can use any of the other maps available from this site. Many of
+      them were created from Tiger/Line maps, but they are several years out of
+      date. It is suggested that you don't use these as your primary
+      street-level maps; the newer shapefile-based maps are usually preferable.
+      In cases where you cannot compile shapefile support, these maps suffice.
+
+      
+     PocketAPRS vector maps:
+
+      The WinAPRS 2.51 distribution included the full collection of 
+      PocketAPRS vector maps for the USA. The download is about 60MB, from the
+      TAPR ftp site.
+
+        ftp://ftp.tapr.org/aprssig/winstuff/WinAPRS/waprs251.zip
+
+   
+     Raster Maps:
+
+      For Canada there is a country wide set of topographic map images available 
+      from the "Department of Natural Resources Geomatics Canada". Running 
+      /scripts/toporama250k.pl will pull down 430mb of 1:250k map images 
+      from that departments site. If thats not enough data, running
+      /scripts/toporama50k.pl will pull down around 10gigs
+
+**** Note that recent changes at the "Department of Natural Resources Geomatics 
+Canada" have made these scripts fail.  Changes to the scripts are being coded 
+and tested.  CVS well be updated once the scripts are proven to work again. ****
+
+
+     For Ireland, EI8IC (http://www.mapability.com) has produced a set of overlay 
+     maps that show the County Borders, Main Towns and Roads.  John, EI7IG, has 
+     created a set of ".geo" files to go with them and they are all available in one 
+     tarball from [http://ireland.aprs2.net/xastir/IrelandMaps/Ireland.tar.gz 
+     ireland.aprs2.net] They are free for non-commercial use.
+
+     Also available are a map of the 
+     [http://ireland.aprs2.net/xastir/IrelandMaps/Ireland1600x2000.bmp country], with 
+     an associated [http://ireland.aprs2.net/xastir/IrelandMapsIreland1600x2000.geo 
+     geo] file, the [http://ireland.aprs2.net/xastir/IrelandMaps/Ireland1600x2000.bmp 
+     South East], it's associated  
+     [http://ireland.aprs2.net/xastir/IrelandMapsIreland1600x2000.geo geo] and a 
+     [http://ireland.aprs2.net/xastir/IrelandMaps/IrishMET.geo Weather Radar] .geo file.
+
+
+     Shapefile format maps (Requires shapefile support):
+
+      Shapefile format maps are slowly becoming the standard vector format of
+      maps used with Xastir. Xastir 1.3.2 and above by default enable dbfawk
+      support for parsing shapefile metadata, see below.
+
+      A nice world map is available at http://aprsworld.net/gisdata/world/
+      thanks to James Jefferson, TerraSpace, Russia, and the Digital Chart
+      of the World (for Antarctica).  Note that this file is currently
+      available only in uncompressed or in tar/bzip2 format.  To decompress
+      the latter file, you'd type "bunzip2 filename" and then
+      "tar xvf filename".
+   
+      TIGER/Line Shapefiles:
+
+      Tiger/Line 2006 Second Edition data converted to shapefile format is 
+      available from ftp://aprs.tamu.edu/. Look in the "pub/TIGER_2006_SE" 
+      directory.  These maps only work with dbfawk support
+
+      Unpack the zipfiles in your maps directory.  I recommend creating
+      a "TIGER_2006_SE" subdirectory or something similar, and unpacking
+      the zipfile there.  When unpacked, each state zipfile will produce
+      a directory with the state's postal abbreviation as its name, and
+      two subdirectories, "Polylines" and "Polygons."  These directories
+      each contain shapefiles with different information in them --- Polylines
+      are linear features such as roads and streams, Polygons are area features
+      such as parks and airports.  You need both, even though they have the
+      same names (the name of the county they cover).
+
+      You can also create your own TIGER/Line shapefiles from the raw
+      data at the Census web site,
+      http://www.census.gov/geo/www/tiger/index.html.  
+      The process requires two conversions: converting the linear
+      features, and assembling the polygon features.  The TIGER/Line data is
+      a topological format, and polygons are not stored in a simple manner;
+      this second step is time consuming.
+
+      To convert the polylines: 
+      Download the county files you want. Then unzip each one into its
+      own directory (call it "in_directory"). Then cd to in_directory and
+      run the following command:
+
+            ogr2ogr -f "ESRI Shapefile" -t_srs EPSG:4326 foo .
+
+      This will create a subdirectory of in_directory called "foo" which
+      will contain a number of shapefiles and auxiliary data. The files
+      called "CompleteChain.*" are the ones you want; they are the polylines
+      corresponding to roads and other linear features. Copy these to your
+      xastir maps directory and rename them to the name of the county they
+      represent. Then install tgr2shp.dbfawk in your share/xastir/config
+      directory and reindex maps. Ta da. See above: tgr2shp.dbfawk is now
+      part of the xastir distribution..."
+
+      Note that you'll need dbfawk support compiled into Xastir to make
+      these Tiger/Line maps look nice.  For the 2003 TIGER/Line data,
+      Derrick Breshear created scripts to process all of the Tiger/Line raw
+      data into Shapefiles, then they were put on a download site made
+      available by Kevin Glueck, "http://xastir.tamu.edu/".  The 2006 Second
+      Edition data were processed by Jason Winningham and made available on
+      the ftp://aprs.tamu.edu/ site by Gerry Creager.  Thanks go to Tom,
+      Derrick, Kevin, Jason and Gerry for making these maps so accessible to
+      the rest of us.
+
+      The second step to rolling your own TIGER/Line shapefiles is to
+      assemble the polygons.  This requires GDAL/OGR configured with python
+      support, and requires that you have the Python language installed.
+      Use the script Xastir_tigerpoly.py included in the "scripts" directory
+      of Xastir's source tree.
+
+      As an example, if you have un-zipped the file TGR35001.zip (the
+      TIGER/Line file for Bernalillo County, NM) into a directory called
+      TGR35001, then
+   
+            Xastir_tigerpoly.py TGR35001 Bernalillo_County_NM_Polys.shp
+
+      would create a shapefile of TIGER polygons (water bodies, political
+      boundaries, parks, wilderness areas) that you can install in your maps
+      directory and read directly using normal shapefile support.
+      
+      Viewing these shapefiles as filled polygons requires dbfawk support,
+      and the rules for displaying them are contained in the file
+      tgr2shppoly.dbfawk.
+
+
+      Tiger/Line 2000 map data is available from:
+      http://www.esri.com/data/download/census2000_tigerline/index.html
+      but requires free registration.  A example of these types of files can
+      be found at "http://wetnet.net/~we7u/xastir/maps/shapefile/USA/WA/".
+      You'll need to run "tar xzvf <filename>" on each one of the files
+      from that last site after downloading.  Some layers that may be of
+      interest:
+
+
+        CMSA/MSA Polygons 2000              tgr*msa00.shp
+        PMSA Polygons 2000                  tgr*pms00.shp
+        Consolidated Cities                 tgr*city.shp
+        County - Current                    tgr*cty.shp
+        County 2000                         tgr*cty00.shp
+        Designated Places 2000              tgr*plc00.shp
+        Designated Places Current           tgr*plccu.shp
+        Key Geographic Locations            tgr*kgl.shp
+        Landmark Points                     tgr*lpt.shp
+        Landmark Polygons                   tgr*lpy.shp
+        Line Features - Hydrography         tgr*lkH.shp
+        Line Features - Landmarks           tgr*lkD.shp
+        Line Features - Misc. Transport     tgr*lkC.shp
+        Line Features - Non-visible         tgr*lkF.shp
+        Line Features - Physical            tgr*lkE.shp
+        Line Features - Rails               tgr*lkB.shp
+        Line Features - Roads               tgr*lkA.shp
+        Line Features - Unknown             tgr*lkX.shp
+        School Districts - Elementary       tgr*elm.shp
+        School Districts - Middle           tgr*mid.shp
+        School Districts - Secondary        tgr*sec.shp
+        School Districts - Unified          tgr*uni.shp
+        Traffic Analysis Zones              tgr*taz.shp
+        Urban Areas                         tgr*urb.shp
+        Water Polygons                      tgr*wat.shp
+        Alternate Feature Names             tgr*alt.shp
+        Address Matching Info               tgr*add2.shp
+        ZIP+4 Left and Right Info           tgr*zip.shp
+        Key Geographic Location Addresses   tgr*add.shp
+        Landmark Polygon Names              tgr*lpy2.shp
+        Landmark Polygons Multi-Landmark    tgr*lpy3.shp
+        Water Polygons Multi-Names          tgr*wat2.shp
+
+      Older Tiger97 maps converted to shapefile download-able from:
+      http://www.mapshots.com
+
+      Some other shapefile format maps are available at:
+      http://www.nws.noaa.gov/geodata/
+
+      Still other shapefiles are available from esri.com, geographynetwork.com
+      and gisdatadepot.com (from their "free data" link).  Lot's of useful
+      stuff at these sites, just look around.  You can also check
+      with your County GIS office for shapefiles of your county.  You can
+      convert them from State Plane to Lat/Long projection using
+      instructions later in this document.
+
+      Canada street maps in Shapefile format are available at
+      http://www.geobase.ca
+
+      If you also use GeoTIFF images, get the handy usgs_24kgrid.zip file from
+      http://data.geocomm.com/quadindex/.  This file provides a grid of all of
+      the 7.5' maps and their names for the U.S.
+
+      A nice world map is available at http://aprsworld.net/gisdata/world/
+      thanks to James Jefferson, TerraSpace, Russia, and the Digital Chart
+      of the World (for Antarctica).  Note that this file is currently
+      available only in uncompressed or in tar/bzip2 format.  To decompress
+      the latter file, you'd type "bunzip2 filename" and then
+      "tar xvf filename".
+
+      www.bts.gov has the "National Transportation Atlas" that you can download
+      pieces of (at least for the larger layers) or ask for (free) CD-ROM's to be
+      mailed to you.
+
+      -----
+      Re-projecting shapefiles (or: why doesn't my shapefile show up?)
+
+      A shapefile is pretty much just a collection of points and lines
+      between points.  Xastir expects that those points are expressed in
+      degrees of longitude and latitude with positive values indicating N
+      and E and negative values indicating S and W.
+
+      One often comes across shapefiles with data in some other format, such
+      as UTM or state-plane projections with units in meters or feet.  You
+      must re-project these sorts of shapefiles in order to use them in
+      Xastir.  You must either know what the current format is of the
+      shapefile you wish to re-project, or have the .prj file that some
+      shapefiles come with.
+
+      Fortunately, the shapelib-1.2.10 distribution (which you probably
+      compiled and installed to enable shapefile maps in Xastir) includes a
+      tool for performing this re-projection.
+
+      First make the shpproj utility by:
+
+      1. change to directory: <shapelib source directory>/contrib
+      2. type 'make' to compile the contrib files
+      3. Optionally install shpproj by copying it to /usr/local/bin
+
+      shpproj takes 4 arguments:
+
+          shpproj shp_file new_shp -i="in_params" -o="out_params"
+
+      shp_file is the name of your existing shapefile triad (without the
+      extension).
+
+      new_shp is the name of your new shapefile triad (which doesn't exist
+      yet).
+
+      -i="in_params" are the parameters describing the existing shapefile.
+
+      -o="out_params" are the parameters describing the new shapefile.  We
+      want this to be "geographic".
+
+      Examples:
+
+      Convert shapefile triad from US State-plane, South Central Texas region
+      (FIPS code 4204), in feet to geographic:
+
+        shpproj stateplane_shapefile geographic_shapefile \
+             -i="init=nad83:4204 units=us-ft" -o=geographic
+
+      Convert UTM zone 15 to geographic:
+
+        shpproj utm_shapefile geographic_shapefile \
+             -i="proj=utm zone=15 units=m" -o=geographic
+
+      To get a listing of the FIPS codes, you need to have proj installed
+      (see elsewhere in this file for more information).  Look in the
+      "<proj source directory>/nad/nad.lst" file.
+
+      For more detailed documentation, see the shpproj.txt file in the
+      "<shapelib source directory>/contrib/doc" directory.
+
+      There's a resource for looking up the FIPS codes for a particular
+      area:
+
+            http://www.aprs.net/fips/
+
+      An important note about using shpproj to re-project maps 
+
+      The shpproj program cannot be used to convert shapefiles unless they're
+      already using the NAD83 or WGS84 datum.  shpproj will do the conversion
+      if you ask it to, but it will do it incorrectly.
+
+      A simple program to convert shapefiles between various projections
+      that does do datum conversions correctly is "shpcs2cs," available
+      from
+          <http://www.swcp.com/~russo/shape_web/>
+      That program requires libproj to be installed properly, and uses a 
+      command line format similar to the "cs2cs" program that comes with 
+      libproj.
+
+      If you already have GDAL installed, you should have the "ogr2ogr" 
+      program available to you.  ogr2ogr will not only convert projections
+      and geodetic datum correctly, but will also convert format (ArcView
+      binary format to shapefile, TIGER/Line files to shapefile, etc.).
+      Some detailed instructions for using ogr2ogr to do this conversion
+      are available at 
+          <http://www.swcp.com/~russo/shape_web/>
+
+      -----
+
+      Using "dbfawk" to interpret shapefile DBF data:  Each shapefile
+      map (*.shp, *.shx) comes with a DBase data file (*.dbf) in which
+      each shape in the .shp file has a corresponding set of descriptive
+      data about that shape in the .dbf file.  While shapefiles are all
+      a standard format and will most always draw (possibly after having
+      been re-projected with shpproj), the corresponding .dbf data varies
+      widely depending on the data source.  For example, US Census
+      Tiger/Line files contain 20 attributes for each shape including such
+      values as the name of the shape (i.e. street name), and a "Census
+      Feature Class Code" (CFCC) which indicates whether a shape is a
+      dirt road or a superhighway, for example.   
+
+      In "pre-dbfawk" Xastir, knowledge of the various sources of
+      shape files was built into the program and it was necessary to
+      add code to support new shapefile sources (such as those
+      produced by local government agencies, non-US, etc.).  Xastir
+      with dbfawk moves this logic into metadata files named *.dbfawk.
+      These files are linked to the .shp/.dbf files they belong with in
+      one of two ways:
+        1. "Signature" recognition.  .dbfawk files located in the config/
+           directory are read to find the "dbfinfo" signature, which is
+           simply the ordered list of attribute names found in the .dbf file.
+           If you browse config/*.dbfawk you will see dbfawk's for the most
+           well know shapefile types.  For example, tgrlk.dbfawk matches
+           all the "tgr*lk?.dbf" US Census Tiger/Line files.  When a shapefile
+           map is displayed, it's .dbf signature is matched up with one of
+           the config/*.dbfawk files.
+        2. "Tied" to a file.  If you installed a .dbfawk file in the same
+            directory as the .shp and .dbf files (e.g. sample.shp, sample.dbf
+            get a corresponding sample.dbfawk) then that file is used instead
+            of signature matching.
+      The first method allows a single .dbfawk file to be automatically
+      used for hundreds of standard shapefile maps.  The later allows you
+      to customize how your particular shapefile map displays.
+
+      What's in a .dbfawk file?  The best documentation of these files
+      is found by looking at the commented examples in config/*.dbfawk.  
+      dbfawk is modeled after the "awk" pattern scanning and processing 
+      language -- but, it is *not* exactly awk:
+        - Regular expression syntax is that used by Perl (the pcre library
+          is used) rather than pure awk.
+        - Action statements are much more limited than full-blown awk.
+        - The concept of records and fields is used since a .dbf record
+          is structured of usually several fields (name, feature type, etc.).
+      That said, what dbfawk does is allow a great degree of control of
+      how and when shapes and their names are displayed.  This is done by
+      setting the values of several "builtin" variables [Technically, these 
+      are only built-in to shapefile support.  Potentially the awk-like 
+      code can be extended to other uses.]:
+        dbfinfo:   the "signature" to match against.
+        dbffields: which fields to read from the .dbf file.
+        color:     what color code to display the shape with.
+        lanes:     width of the shape.
+        name:      name of the shape.
+        key:       search key (used for WX alerts to find the shape)
+        symbol:	   symbol for landmarks, etc.
+        filled:	   draw polygons filled.  Filled="Yes" or "No" in the Map
+                   Properties dialog will override this option.  Set to "Auto"
+                   in that dialog to have the dbfawk file control this.
+        fill_style: style of fill (0=solid, 1=FillTiled, 2=FillStippled, etc.)
+        fill_color: color of fill
+        fill_stipple: stipple pattern if fill_style=2 ("FillStipple")
+                      0=13 percent, 1=25 percent, 2=50 percent.
+        pattern:   solid or dashed lines.
+        display_level: at what zoom level to begin displaying the shape
+        label_level: at what zoom level to begin displaying labels
+        label_color: color to use for labels
+      
+      Execution of a dbfawk file:  Just like awk, the file consists of
+      patterns that are matched against input data and actions to take
+      when the pattern matches.  There are four special patterns in dbfawk:
+        BEGIN_RECORD: action is executed just before parsing a record.
+        BEGIN: action is executed just before parsing a field.
+        END: action is executed just after parsing the field.
+        END_RECORD: action is executed just after parsing a record.
+      All other patterns are regular expressions that are matched against
+      a data value of <fieldname>=<value>.  For example:
+        FENAME=Main
+
+      Actions in dbfawk files consist of setting variables and two special
+      actions:
+        next: skips to the next field in the record.
+        skip: skips to the next record.
+      If neither next nor skip is given in the action, then processing falls
+      through to the next pattern/action pair in the dbfawk file.
+      
+      The special dbffields variable is used to list which fields of the
+      record to be processed and in what order.  The order is significant
+      since it may take several DBF fields to build up a complete name.
+      For example, in Tiger/Line, the street name is actually the 
+      concatenation of FEDIRP, FENAME, TYPE, FEDIRS.  Here's an excerpt
+      from tgrlk.dbfawk to demonstrate:
+        BEGIN {dbffields="TLID:FEDIRP:FENAME:FETYPE:FEDIRS:CFCC"}
+        ...
+	/^FEDIRP=(.+)$/ {name="$1 ";next}
+	/^FENAME=United States Highway (.*)$/ {name="$(name)US $1"; next}
+	/^FENAME=State Highway (.*)$/ {name="$(name)State $1";next}
+	/^FENAME=State Route (.*)$/ {name="$(name)SR $1";next}
+	/^FENAME=(.*)$/ {name="$(name)$1; next}
+	/^FETYPE=(.+)$/ {name="$(name) $1"; next}
+	/^FEDIRS=(.+)$/ {name="$(name) $1"; next}
+      
+      Creating and testing dbfawk files:  You can test an existing dbfawk
+      file by setting debug level 16 in Xastir (this will generate a huge
+      amount of map rendering debug output, including dbfawk info):
+       "./xastir -v 16 2>/tmp/log"
+      Or, use "testdbfawk" which reads a .dbf file (or single field assignments
+      on the command line).  For example:
+	testdbfawk -D . -d tgr36119lkA.dbf 2>&1|less
+	20 Columns,  42427 Records in file
+	sig: TLID:FNODE:TNODE:LENGTH:FEDIRP:FENAME:FETYPE:FEDIRS:CFCC:FRADDL:TOADDL:FRADDR:TOADDR:ZIPL:ZIPR:CENSUS1:CENSUS2:CFCC1:CFCC2:SOURCE
+	DBF Signatures match!
+	name=Hancock Ave, key=80309984, symbol=, color=40, lanes=1, filled=0, pattern=1,display_level=96,label_level=16
+
+      testdbfawk takes the following command line syntax:
+        testdbfawk --help
+          Prints command line usage
+        testdbfawk -D directory -d file.dbf
+          Scans directory for dbfawk files with signatures matching file.dbf,
+          runs the dbfawk program that matches if it's found.
+        testdbfawk -f file.dbfawk -d file.dbf
+          runs the dbfawk file "file.dbfawk" over the dbf file "file.dbf"
+
+      So in the example above, testdbfawk scans the current directory
+      for dbfawk files with signatures that match tgr36119lkA.dbf's
+      signature.  testdbfawk dumps its output to standard error, so in
+      the example standard error is redirected to standard out and
+      piped into "less" for paging.
+
+      To create a .dbfawk file, you need to understand the layout and contents
+      of your .dbf file.  Use "dbfinfo" and "dbfdump" which are in the shapelib
+      contrib directory.  Dbfinfo will list the field names and dbfdump will
+      dump out all fields of all records.  Take the field names from dbfinfo,
+      and concatenate them together in order, separated by ":" to make the
+      dbfinfo= signature variable assignment.
+
+      Your best bet is to start with an existing .dbfawk file as an example.
+
+      Dbfawk hints and kinks:  You have to think like an awk programmer and
+      realize that the order that rules are listed matters, that it's important
+      to use "next" as soon as it makes sense so other rules aren't looked at
+      unnecessarily and, to use "skip" when you want to fix bad dbf data.
+      For example, my county's Tiger/Line maps have several coding errors
+      where a segment of a main highway is incorrectly labeled as a local 
+      street.  This rule overrides one of those incorrect records:
+	# This Furnace Dock Rd segment is really Rt 9!
+	/^TLID=139773160$/ {name="Briarcliff-Peekskill Pky"; display_level=8192; label_level=512; color=4; lanes=4; skip;}
+      TLID is the Tiger/Line ID which is the unique identifier for this 
+      segment.
+      -----
+
+    Rolling your own shapefile maps:
+
+    It is relatively easy to create your own shapefile maps (for example,
+    if you want to highlight a walk-a-thon course).  There are several
+    methods available with Xastir:
+
+    1. Use GPSMan to download a GPS track to a shapefile.
+
+    2. Save a station tracklog of an actual station or an object that
+       you manually move along the course.  When you select Station Info,
+       you are presented with the option to save the track, which gets
+       put in 
+       .xastir/tracklogs/<datestamp>_<callsign>_APRS_Trail_<color>.*
+       You can move the .shp, .shx, and .dbf files to your maps directory.
+       Use DBFAWK to make a map-specific .dbfawk file.  For example:
+	BEGIN {dbfinfo="Credits:DateTime";dbffields="Credits:"}
+	BEGIN_RECORD {key=""; lanes=4; color=12; name=""; filled=0; 
+           pattern=1; display_level=8192; label_level=32; symbol=""}
+       This makes the track width 4 and red (12).
+
+    3. You can use xastir's "object" capability to generate shapefile maps.
+       a) Turn off object transmission using 
+          Interface->Disable Transmit:Objects
+       b) Put objects where you want.  Set the display symbol as you like it.
+       c) run the "object2shp.pl" script in the scripts directory
+           (/usr/local/share/xastir/scripts/object2shp.pl in most installations)
+          to generate a shapefile:
+            /usr/local/share/xastir/scripts/object2shp.pl ~/.xastir/object.log myshape
+          This requires the four shapelib utilities "dbfcreate", "shpcreate",
+          "shpadd" and "dbfadd" as described below.
+       d) EXIT XASTIR
+       e) REMOVE ~/.xastir/config/object.log
+       f) move "myshape.shp," "myshape.shx," and "myshape.dbf" to your maps
+          directory.
+       g) restart xastir.  
+       h) select your newmap in the map chooser.
+      Creating maps in this way is basically just a scripted version of the
+      manual map generation technique in (4) below.
+
+    4. You can also use the shapelib tools (shpproj was presented earlier)
+       to manually create a shapefile.  For example, the following 
+       marks out the mile-posts for a marathon, using tgrlpt.dbfawk
+       (US Census Tiger/Line landmark points with an APRS(tm) symbol extension) 
+       for the metadata:
+       #!/bin/sh
+       # turn mileposts into a Tiger landmark shapefile
+
+       rm -f posts.shp posts.dbf
+       shpcreate posts point
+       dbfcreate posts -n ID 8 0 -s CFCC 3 -s NAME 30
+       shpadd posts -74.0570 40.6025
+       dbfadd posts 1 'X\m ' Start
+       shpadd posts -74.0443 40.6065
+       dbfadd posts 2 'X\m ' 1M
+       shpadd posts -74.0353 40.6093
+       dbfadd posts 3 'X\m ' 2M
+       shpadd posts -74.0268 40.6260
+       dbfadd posts 4 'X\m ' 3R
+       shpadd posts -74.0200 40.6277
+       dbfadd posts 5 'X\m ' 3G
+       shpadd posts -74.0270 40.6252
+       dbfadd posts 6 'X\m ' 3B
+       shpadd posts -74.0197 40.6395
+       dbfadd posts 7 'X\m ' 4R
+       shpadd posts -74.0203 40.6388
+       dbfadd posts 8 'X\m ' 4BG
+       shpadd posts -74.0077 40.6508
+       dbfadd posts 9 'X\m ' 5R
+       shpadd posts -74.0083 40.6503
+       dbfadd posts 10 'X\m ' 5BG
+       shpadd posts -73.9957 40.6623
+       dbfadd posts 11 'X\m ' 6R
+       shpadd posts -73.9962 40.6617
+       dbfadd posts 12 'X\m ' 6BG
+       shpadd posts -73.9850 40.6743
+       dbfadd posts 13 'X\m ' 7R
+       shpadd posts -73.9858 40.6738
+       dbfadd posts 14 'X\m ' 7BG
+       shpadd posts -73.9782 40.6865
+       dbfadd posts 15 'X\m ' 8M
+       shpadd posts -73.9597 40.6890
+       dbfadd posts 16 'X\m ' 9M
+       shpadd posts -73.9573 40.7007
+       dbfadd posts 17 'X\m ' 10M
+       shpadd posts -73.9622 40.7122
+       dbfadd posts 18 'X\m ' 11M
+       shpadd posts -73.9515 40.7230
+       dbfadd posts 19 'X\m ' 12M
+       shpadd posts -73.9520 40.7345
+       dbfadd posts 20 'X\m ' 13M
+       shpadd posts -73.9525 40.7465
+       dbfadd posts 22 'X\m ' 14M
+       shpadd posts -73.9403 40.7503
+       dbfadd posts 23 'X\m ' 15M
+       shpadd posts -73.9578 40.7587
+       dbfadd posts 24 'X\m ' 16M
+       shpadd posts -73.9556 40.7675
+       dbfadd posts 25 'X\m ' 17M
+       shpadd posts -73.9465 40.7808
+       dbfadd posts 26 'X\m ' 18M
+       shpadd posts -73.9372 40.7935
+       dbfadd posts 27 'X\m ' 19M
+       shpadd posts -73.9272 40.8047
+       dbfadd posts 28 'X\m ' 20M
+       shpadd posts -73.9343 40.8142
+       dbfadd posts 29 'X\m ' 21M
+       shpadd posts -73.9453 40.8050
+       dbfadd posts 30 'X\m ' 22M
+       shpadd posts -73.9525 40.7923
+       dbfadd posts 31 'X\m ' 23M
+       shpadd posts -73.9630 40.7810
+       dbfadd posts 32 'X\m ' 24M
+       shpadd posts -73.9720 40.7696
+       dbfadd posts 33 'X\m ' 25M
+       shpadd posts -73.9811 40.7683
+       dbfadd posts 34 'X\m ' 26M
+       shpadd posts -73.9763 40.7720
+       dbfadd posts 35 'X\m ' Finish
+    ---------
+
+    Splitting large Shapefile maps into regularly-sized tiles:
+
+      Look for "shp2tile" at http://imaptools.com/tools/, it does
+      exactly that.  This can speed up Xastir tremendously if you're
+      zoomed in quite a bit on a large Shapefile map (or maps).  If
+      it is broken into tiles Xastir only has to load the tiles of
+      interest instead of slogging through the entire large file
+      each time.
+
+
+    GeoTIFF Map files (requires GeoTIFF):
+
+      If you compiled in geoTIFF support, you can use USGS DRG topographic
+      maps. These are primarily useful to U.S. users. DRG topo maps can be
+      found for free for most states, and can be purchased for others.
+
+        http://www.bianifc.org/gis_gps/gps/drgfree.html
+        http://www.gisdatadepot.com
+
+      or try a google search with "free drg maps" as the search query.
+
+      If you have no luck finding free DRG maps, go to
+      http://www.geocomm.com/ and check out the "DRG Data Bundles"
+      they have available.  You can purchase a DVD containing all the
+      DRGs for an entire state in three scales, all of them usable in
+      xastir, for a relatively low price.  Be warned, however, that
+      parts of the US have DRGs that are produced by an agency other
+      than the United States Geological Survey, and these DRGs are not
+      necessarily in correct GeoTIFF format.  The areas covered by the
+      Tennessee Valley Authority appear to be among those, as one
+      xastir user discovered when purchasing a DVD of DRGs for North
+      Carolina.  It is still possible to use these DRG files, but they
+      need preprocessing.  See the section below entitled "Defective
+      GeoTIFF files need even more special processing."
+
+      Many useful US maps can be downloaded from the National Map Viewer: 
+      http://nmviewogc.cr.usgs.gov/viewer.htm
+
+      Free FAA sectional charts can be downloaded from
+        http://aviationtoolbox.org/raw_data/FAA_sectionals/current/
+      This site was set up by someone who had a subscription to the FAA
+      DVD collection and made them available on the web (this is legal per
+      FAA's terms of use).  They are no longer being updated as of mid 2005.
+      These charts are in Lambert Conformal Conic projection, though, and
+      need to be converted with gdalwarp to be usable in xastir (see below).
+
+      Current, valid-for-navigation FAA sectional charts may be purchased
+      from the FAA at
+ 	https://naco.faa.gov/ecomp/Catalog.aspx?a=AERO+NOS+DIGITAL
+      for about $1.50US each.  These files are also in GeoTIFF and are the
+      same type as those that are available on aviationtoolbox, but these are
+      updated every 6 months and are kept current.  You will have to process
+      them before viewing in xastir.
+
+      The 7.5' topo maps work the best so far.  Be sure to install the .tif AND
+      the .fgd files side-by-side into the map directories. Without the .fgd
+      file Xastir won't be able to crop the white border from the map.  Xastir
+      currently knows how to handle NAD27, NAD83, and WGS84 geoTIFF files.
+      GeoTIFF files created in other datums will be displayed at an incorrect
+      location with Xastir. The .tfw files included with most geoTIFF images
+      are not used by Xastir.
+
+      If you must make FGD files by hand, the included script mapfgd.pl can
+      create them for you from the USGS geoTIFF files. The format Xastir is
+      looking for is the following:
+
+        1.5.1.1  WEST BOUNDING COORDINATE:  -122.000000
+        1.5.1.2  EAST BOUNDING COORDINATE:  -120.000000  
+        1.5.1.3  NORTH BOUNDING COORDINATE:  48.000000 
+        1.5.1.4  SOUTH BOUNDING COORDINATE:  47.000000 
+
+     -or-
+
+        1.5.1.1  West_Bounding_Coordinate:  -122.000000
+        1.5.1.2  East_Bounding_Coordinate:  -120.000000  
+        1.5.1.3  North_Bounding_Coordinate:  48.000000 
+        1.5.1.4  South_Bounding_Coordinate:  47.000000 
+
+      Notes about DRG-Enhanced (DRG-E) files:
+      * The DRG-E files will draw over the correct spots if you remove
+      the .fgd file, but will overflow their boundaries and
+
+      * The DRG-E files will draw over the correct spots with decent
+      boundary trimming (as far as I can tell, which isn't very far:
+      correct me!) if you use a .fgd file taken from 'real' DRG files
+      from USGS.
+
+      Basically: get rid of the .fgd file from the DRG-E!!
+
+    Highly Compressed MrSID image files:
+
+      Be wary of DRG-E or DOQQ files that are compressed with MrSID
+      compression.  That is a proprietary compression format for
+      which we do not have access to the decoding algorithm.  We
+      cannot use those from within Xastir.  There's possible good news
+      lurking on the horizon though:  LizardTech has mentioned on the
+      gdal-dev mailing list that they might be supporting open-source
+      with a driver for gdal sometime soon.  
+
+      It is also possible to decompress these files with a free tool
+      from LizardTech called "mrsiddecode", available at 
+        http://www.lizardtech.com/download/dl_options.php?page=tools
+
+      mrsiddecode can produce GeoTIFF output with the right command line
+      options.  There is a Linux version of mrsiddecode, but one user
+      has observed that the Windows version running under Wine is a little 
+      more robust.  Your milage may vary.
+
+      Be warned that MrSID is a very effective compression algorithm, and
+      compressed MrSID files of size 5MB could easily decompress into 50MB
+      GeoTIFFs.  
+
+      Note also that many GIS departments take perfectly usable
+      GeoTIFF files with all projection and datum tags and use ESRI products
+      to compress them down into MrSID files, thereby losing all the
+      GeoTIFF tags.  See below.
+
+    GeoTIFF files in certain projections need special processing:
+
+      Not all geotiff files available on the net are usable directly in 
+      xastir.  Some of them are in projections that xastir can't use 
+      properly, and others are missing all of the metadata information that
+      is needed to work out how to convert them to Lat/Lon unprojected rasters.
+      If you encounter a geotiff file that has the correct tags, but is
+      in some projection other than UTM, you can convert that file to a  
+      lat/lon raster if you have gdal installed.  Simply run the following
+      command:
+        gdalwarp -t_srs EPSG:4326 original_raster.tif usable_raster.tif
+
+      This will warp the geotiff file "original raster.tif" from
+      whatever projection it was in into an unprojected lat/lon raster
+      "usable_raster.tif" that can be directly read into xastir.
+      Depending on the source projection, you might get a map that
+      doesn't tile well with other maps due to the inclusion of opaque
+      border material, but it can sometimes be the only way to import
+      a map you need to use.
+
+    Defective GeoTIFF files need even more special processing:
+
+      It is unfortunately the case that the ESRI software in use by many
+      GIS departments produces GeoTIFF files that have NO information about
+      the coordinate system that applies to them --- they'll have just
+      enough information to know what the numerical coordinates of each 
+      pixel are, but no information to tell you whether those coordinates are
+      UTM, Lat/Lon, State Plane, or anything else.  For such maps you will
+      need to determine the coordinate system by finding external files
+      called "metadata" that are associated with the images.  US
+      Federal datasources have a standardized file format (".fgd") that
+      provides this information, but many state or university GIS departments
+      just make some other format up for themselves.  Most sources of
+      map data should have such metadata available, but sometimes it is a bit 
+      of a chore to find it.
+
+      You can determine whether a .tif file has coordinate system information
+      in it using the "gdalinfo" command from the GDAL suite or "listgeo" from
+      the libgeotiff distribution.  If gdalinfo shows something like this:
+
+        Driver: GTiff/GeoTIFF
+        Size is 5364, 7620
+        Coordinate System is `'
+        Origin = (588067.750000,5331248.500000)
+
+      you're the lucky owner of a file that has no coordinate system info
+      (because the only thing after "Coordinate System is" is a pair of
+      quotation marks).   Another dead givaway would be:
+         Metadata:
+           TIFFTAG_SOFTWARE=Arc/Info
+      which tells you that the image was processed with a piece of software
+      that fails to put in all the right tags.
+
+      If you get maps whose metadata say are in UTM projection but for which
+      gdal indicates missing geoTIFF tags like it does in the example above, 
+      xastir won't be able to display them unless you fix them up.
+      Fortunately, the GDAL library tool "gdal_translate" can do the
+      job.  For example, if you have a source map with metadata that
+      says it's in UTM Zone 10, NAD83 datum, to make it suitable for
+      Xastir to read you can do something like this:
+
+      gdal_translate -a_srs EPSG:26910 original.tif georeferenced.tif
+
+      The inclusion of the "-a_srs" option to gdal_translate
+      forces the new tiff file to have the correct geotiff tags to
+      indicate that coordinate system.  
+
+      The EPSG number to use for images in UTM projection with NAD83
+      datum is 26900 plus the UTM zone number.  The EPSG number for UTM in
+      NAD27 is 26700 plus the zone number.  The above command
+      will allow Xastir to read in the image and reference it
+      properly.  If you do the gdalwarp option above instead, you can end up
+      with solid color areas between the edges of the original image
+      and the lat/long rectangle that the image will be warped to; these 
+      extra pixels represent "no data" areas due to the difference in shape
+      between the original rectangular image and the warped image.   The 
+      color of this area depends on the colors present in the original
+      image; GDAL attempts to use a color that is different from any in the
+      source image.  If those areas don't matter to you, then either
+      method will work for you.  If you're planning to tile multiple
+      UTM images together, then the gdal_translate option is best.
+
+      If your maps are NOT in UTM, you must also gdalwarp, because xastir
+      cannot properly display geotiffs that are in projections other than
+      UTM or "unprojected" lat/lon.  
+
+      EPSG numbers for odd-ball coordinate systems can be found at 
+      http://www.remotesensing.org/geotiff/proj_list/Wkt_adam.zip
+
+      Maps that require gdalwarp include the FAA sectionals mentioned above,
+      and some topo maps in obscure state plane coordinates from various state
+      GIS departments.
+
+    XASTIR can only use GeoTIFF files that are 8-bit per pixel with one band
+
+      Some geotiff files contain multiple bands or multiple bytes per pixel.
+      Xastir currently uses only BYTE format, so you may need to convert the
+      geotiff file with gdal_translate.  The number of bands, bytes per 
+      pixel and other information about geotiff files can be obtained using
+      gdalinfo.  
+
+      One-band, 16- or 32-bit-per-pixel:
+       The command "gdal_translate -ot BYTE original.tif new.tif" 
+       can convert 16 and 32 bit per pixel geotiffs to ones that can be used
+       by xastir
+   
+      Multiple band, 8-bit-per-pixel:
+
+      The command "gdal_translate -ot BYTE -b 1 old.tif new.tif" 
+      can extract a single band as a grey scale layer from a multi-band 
+      geotiff file, but this is probably not what you really want.
+      The command 
+            rgb2pct.py old.tif new.tif
+      can create a single band palette based geotiff from a three band rgb 
+      tif by dithering the colors down to a small pallette.  This last
+      tool requires gdal built with Python support.  See the gdal 
+      documentation for these tools for further information.
+
+    More manipulations of GeoTIFF files:
+
+      gdal also provides several additional tools that can be used to 
+      tile maps or chop them up into smaller pieces, but explaining the
+      details of that process is probably beyond the scope of this document. 
+      See the man pages for "gdal_translate" and "gdal_merge.py" for 
+      an explanation of how those tools could be used to accomplish this.
+
+    .geo files/online maps & graphics:
+
+      If you have ImageMagick and wget or libcurl installed, .geo files
+      for NWS radars are available from one of these sites:
+
+          ftp://gcpoolz.com/geos/Srb_geos.zip
+          http://wetnet.net/~we7u/xastir/maps/radar-geos.tgz
+
+      You'll probably want to add an IMAGESIZE line to each one to speed up
+      loading when some radars are offscreen: (bash syntax, modify for your
+      shell...)
+
+          for a in srb_*; do echo "IMAGESIZE 620 620" >> $a; done
+
+      NOTE:  For .geo files with an ftp or http address for fetching the image,
+      IMAGESIZE is currently a REQUIRED parameter in the .geo file.  For .geo
+      files where the image is resident on your hard drive, the IMAGESIZE tag
+      is optional.
+
+      Please also note that the coordinates in the .GEO files are expressed
+      in decimal degrees, and are listed with longitude first then latitude
+      on the TIEPOINT lines.
+
+      Tiger maps of the USA are available through the map menu under 
+      "Enable/configure Tigermap". These maps are generated by the census
+      bureau web-server.
+
+      A .geo with only the word "TERRASERVER-SATELLITE" in it will retrieve a
+      satellite photo of the area from terraserver.  You need "wget" or libcurl,
+      plus ImageMagick installed, and support for them compiled into Xastir.  No
+      additional map downloads are needed if these are the only maps that you
+      want to use.
+
+      A .geo with only the word "TERRASERVER-TOPO" in it will retrieve a
+      topographic map of the area from terraserver.  You need "wget" or
+      libcurl, plus ImageMagick installed, and support for them compiled into
+      Xastir.  No additional map downloads are needed if these are the only
+      maps that you want to use.  Other interesting keywords are
+      "TERRASERVER-URBAN" and "TERRASERVER-REFLECTIVITY".
+
+      Other tags you can put in a .geo file: 
+      DATUM: (not used, yet...)
+      PROJECTION: Currently only supports "TM" for transverse Mercator.
+      REFRESH: number of seconds to reload the maps.  Multiple maps
+          with different values pick the smallest value.
+      TRANSPARENT:  Color to remove from the background (make it transparent).
+          Use a number, 0=black.  Color-mapped images use the map value, so 
+          white is usually 0xffff.  Value can be decimal or hex if preceeded 
+          by "0x".  Multiple TRANSPARENT lines can be used in a file to make
+          multiple colors transparent.
+      CROP: removes borders.  Values are [left top right bottom] with
+          (0,0) at the upper left.  A good value for the NWS radar
+          images above is "CROP 35 20 616 600"
+      GAMMA, CONTRAST, NEGATE, EQUALIZE, NORMALIZE, LEVEL, MODULATE:  These 
+          are all ImageMagick options, and are documented there, and
+          briefly in the xastir help file.
+
+     
+     "Find Address" feature (US only):
+
+      The "Find Address" feature is based on the open source geo-coder by
+      Dan Egnor and as such uses the same format for the data. You can
+      download preprocessed data based on Census Tiger 2003 data at:
+      http://www.dementia.org/geocoder/tgr2003/
+
+      Reprocessed geocoding files from the 2006 Second Edition TIGER/Line 
+      data were produced by Jason Winningham in June of 2007 and made 
+      available on the TAMU FTP server by Gerry Creager.  They are much
+      better than the 2003 data, and it is recommended that they be used
+      instead.  Download them from 
+         ftp://aprs.tamu.edu/pub/geocode/
+
+     Geographic Names Information System Labels:
+
+      These aren't maps, but are collections of name labels for locations.
+      These display at various zoom levels like Dos/WinAPRS map labels, but are
+      also searchable from the Maps menu.
+
+         http://geonames.usgs.gov/
+
+      Click the link "Download GNIS Data: State and Topical Gazetteers" on
+      the left.
+
+      These files should be renamed in the form "<ST>.gnis" after download,
+      where <ST> is the abbreviation for the state that they cover, and
+      should be placed in the /usr/local/share/xastir/GNIS/ directory. To
+      make sure that maps are layered correctly with GNIS labels on the top
+      of the map stack, plus searchable, it is suggested that you link
+      /usr/local/share/xastir/maps/z to this GNIS directory.
+
+      Type this as root to create the link and directories:
+       cd /usr/local/share/xastir/maps
+       ln -s ../GNIS z
+
+      The map files must end in ".gnis" to be used by Xastir, and must be in
+      pipe delimited format.  These are readily available from the above link
+      with such filenames as "AZ_DECI.TXT". The files must be renamed to
+      <ST>.gnis, and the trailing whitespace should be removed for speed. This
+      can be accomplished in one step with the following command. (bash
+      style...)
+
+   for a in *deci; do sed -e 's/[ ]*$//g' < $a > `basename $a _deci`.gnis; done
+
+      Individual files can have whitespace removed as follows:
+        sed -e 's/[ ]*$//g' < inputfile > outputfile
+
+      Populated places GNIS file can be had at:
+
+          http://geonames.usgs.gov/stategaz/POP_PLACES_DECI.zip
+
+      A note from Jason Winningham, kg4wsv:
+
+      "The file has over 181k records in it.  You can use the following command
+      to weed out all places with populations less than 1000, and get it down
+      to just under 14k records, which is really fast to load: 
+
+        awk -F\| '{if ($17 > 1000) print $0}' \
+            /usr/local/share/xastir/GNIS/0pop_places.gnis \
+            >/usr/local/share/xastir/GNIS/0pop_places_over_1k.gnis
+
+      I stuck a zero at the beginning of the filename so this would
+      show up in the GNIS directory before any of the state files."
+
+
+     County weather Warning maps (requires shapefile support):
+      
+       The latest shapefile format weather maps may be found here:
+         http://www.nws.noaa.gov/geodata/
+
+       or more easily found here (but not guaranteed to be the most
+       current:
+         http://wetnet.net/~we7u/xastir/Counties/
+
+       We now have a script in the xastir/scripts directory called
+       "get-NWSdata" which fetches the files you need and plops them
+       into the correct directory and unzips them.  Run that script
+       as root.  It requires "wget" to work.  You may then try the
+       NWS-TEST.log test shown below to verify proper operation.
+
+        --------------------------
+        The files of interest are:
+        --------------------------
+
+        NWSI Libraries:
+        ---------------
+        County Warning Area Boundaries (c_*.zip)
+        Public Zone Boundaries (z_*.zip)
+        Coastal and Offshore Marine Zones (mz*.zip, oz*.zip, hz*.zip)
+        Fire Weather Zone Boundaries (fz*.zip)
+
+        County Libraries:
+        -----------------
+        AWIPS Counties (w_*.zip)
+
+      Unzip those files in the /usr/local/share/xastir/Counties/ directory and
+      Xastir should find them and use them for weather alerts. Be sure to
+      include the .shp, .shx, .and dbf.
+           
+       Note that you can also use the county file as the background polygon
+       filled map for drawing county lands and borders.  Either make a link
+       to these files from your maps directory, or copy the files there so
+       that they show up in the Map Chooser.
+
+      To test whether the weather alerts are working (whether weather?), copy
+      the NWS-TEST.log file to your ~/.xastir/logs/ directory and then bring it
+      in to Xastir using the File->Open Log File option.  Zoom in to the
+      WA/OR/ID area (Pacific Northwest) and you should see a picture that looks
+      like this:  <http://www.eskimo.com/~archer/xastir/xastir-wx-alerts.png>
+      Note that you may have to change the dates embedded in the file if Xastir
+      thinks they are expired.  See the notes at the top of that file.  If the
+      alerts are still active they should appear in the View->Weather Alerts
+      dialog.
+
+	Australian rules Weather Alerts
+
+		http://wxsvr.aprs.net.au/implementation.html
+
+     Raw Tiger/Line format maps (requires GDAL/OGR):
+
+      If you have GDAL/OGR library added to Xastir, you should (very soon)
+      be able to use Tiger/Line maps.  The developers are working to add
+      this capability.
+
+      2002 map data can be found here:
+
+        http://www.census.gov/geo/www/tiger/tiger2002/tgr2002.html
+
+      2003 map data can be found here:
+
+        http://www.census.gov/geo/www/tiger/tiger2003/tgr2003.html
+
+     SDTS format maps (requires GDAL/OGR):
+
+        http://edc.usgs.gov/geodata/
+
+      The "hypsography" maps contain topo lines.  They look very nice overlaid
+      on top of terraserver satellite images.  Note that for some types of maps
+      you also need to download a data dictionary file to go with them.
+
+      Also note that the various datasets appear to reuse filenames.  You may
+      need to separate each one into its own subdirectory in order to keep all
+      of the files from getting overwritten by new maps.
+
+     MapInfo TAB/MID/MIF format maps (requires GDAL/OGR):
+
+      http://www.mapinfo.com
+      http://research.umbc.edu/~roswell/mipage.html
+
+
+     Download audio files:
+
+       To play the wav files you will need a program such as vplay to play the
+       audio file through your sound card.
+
+       Grab xastir-sounds.tgz at the ftp site you downloaded Xastir, or at
+        ftp://ftp.tapr.org/software_lib/Linux/xastir/xastir-sounds.tgz
+
+       Un-tar the file.  Put the sounds files into the
+       /usr/local/share/xastir/sounds directory where Xastir can find them.
+       (FIXME: thunder.wav is missing?).
+
+     Download FCC and/or RAC Database files:
+
+       If the FCC database is installed, a Search FCC Database button will
+       appear in the station info box. If the RAC (Radio Amateurs of Canada)
+       database is installed, a Search RAC Database button will appear for
+       callsigns beginning with "VE" or "VA".
+
+       The download and installation of these is automated in the get-fcc-rac.pl
+       script included with Xastir, but you may install them by hand
+       individually if you wish as described here:
+
+       To use the FCC lookup:
+       ----------------------
+
+         Download:
+         http://wireless.fcc.gov/uls/data/complete/l_amat.zip
+
+         (The only file needed from this 87 Meg zip is the EN.dat file)
+
+         **** NOTE To use the data base file it must be sorted first!!! ****
+     
+         unzip l_amat.zip
+
+         To sort the file, make sure you have plenty of disk space for this as
+         the file is BIG!
+
+         cat EN.dat | /usr/bin/perl -pe 's/\r\r\n//g' | sort +4 -t \| > EN.dat.sorted
+
+         Install it in the xastir/fcc directory:
+
+         su
+         mv EN.dat.sorted /usr/local/share/xastir/fcc/EN.dat
+
+
+       To use the RAC lookup:
+       ----------------------
+
+         Download:
+         http://205.236.99.41/%7Eindicatif/download/amateur.zip
+
+         unzip amateur.zip
+         mv AMATEUR.RPT /usr/local/share/xastir/fcc/AMACALL.LST
+
+
+       Hiking trails from National Geographic's Topo or mapXchange:
+       ------------------------------------------------------------
+
+        For those of you who may be familiar with National Geographic's Topo!
+        program, there's a way to use the user-saved data (but not topo maps
+        themselves) from within Xastir.  Many users create TPG and/or TPO
+        files in TOPO from GPS data and/or hand-drawn routes.  They can then
+        upload them to the mapXchange site, and in fact there are many hiking
+        trails that one can download for free from that site.  Okay, how to use
+        them?
+
+        Go to <http://www.gpsbabel.org>.  Go to the Project page and then the
+        CVS page and follow the instructions for grabbing the CVS gpsbabel
+        sources.  Only CVS has the Topo version 3.x support, which was just
+        recently added (May 2006).  Follow their instructions for building/
+        installing/using the program.  It's a command-line program where you
+        specify the input and output formats and filenames.  Using this program
+        you can snag the interesting data out of the files and convert it to
+        GPX format.  Once you have that, you can use the "gpx2shape" script to
+        convert them to Shapefiles.  Xastir can then use them as map files.
+
+
+
+WHERE TO FIND MORE INFO ON MAP DATUMS, ETC:
+
+    Geodesy:
+    http://oceanservice.noaa.gov/education/geodesy/welcome.html
+
+    "Geodesy for the Layman"
+    http://www.ngs.noaa.gov/PUBS_LIB/Geodesy4Layman/toc.htm
+    
+
+
+MAP CACHING (WORKS WITH MOST ONLINE MAPS):
+
+    Map caching works in conjunction with the map download routines,
+    which fetch maps from http or ftp addresses.  The map caching features
+    use functions found in Berkeley DB 4.0 library, AKA libdb (version 4.0
+    or better), to create and manage a cache directory and a persistent
+    database of information about the files in the cache directory.  This
+    directory defaults to ~/.xastir/map_cache.  The files under this
+    directory can be cleaned up or removed by hand at any time - the
+    caching routines will simply download the maps and put new entries
+    into the .db file.
+
+    Map files are saved with filenames that include the number of seconds
+    since the Unix epoch.  This allows the caching routines to easily
+    determine the age of maps so that older cached maps can be deleted.
+    This is currently (Dec 2004) controlled with a compile time maximum
+    age setting.  See map_cache.h for specifics and for brief
+    documentation about all of the map_cache functions. 
+
+
+
+DRAWING YOUR OWN MAPS USING XASTIR ITSELF:
+
+    The final result here will be ESRI Shapefile vector maps that
+    you can then use within Xastir.  You'll need Shapelib compiled
+    into Xastir to make use of this feature (the private copy of
+    Shapelib is fine for this).
+
+    Turn off Object Transmit first (Interface menu).
+
+    Place an object or item at the start location of your route.
+
+    Click on the "Move" button to active move mode, then move that
+    object around the map.  Once you're done you'll have a bunch of
+    straight lines that depict the course.
+
+    Now bring up Station Info on that object and click on the Store
+    Track button.  If you've got Shapelib compiled in, you'll get a
+    shapefile created with the track you just drew.
+
+    After you're done you can delete the object and then turn on the
+    Object Transmit toggle again.  You'll end up transmitting the
+    deleted final position of the object for a few hours unless you
+    kill/restart Xastir, but that's ok.  Nobody will see it on their
+    maps 'cuz it's a deleted object.
+ 
+    Look in ~/.xastir/tracklogs/ for the Shapefile.  Copy it to your
+    maps directory, changing the name on the three files as you
+    like, then create a dbfawk file for it if you want to change how
+    it is drawn in Xastir.
+
+    Another way would be to drive the course with a GPS and then
+    download the track via Xastir/GPSman to create a Shapefile map.
+
+    Yet another way would be to drive it with an APRS rig and then
+    Store Track as described above.  You could also drive with
+    GPS/Xastir (without APRS) to get a very detailed track and then
+    save your own track.
+
+
+
+DRAWING SAR SEARCH SEGMENTS IN XASTIR:
+
+    Turn on "Draw" mode (togglebutton at the top of the main
+    window).  The cursor should change to the Measure/Draw symbol.
+
+    Using the middle mouse button, click on each vertice until you
+    are almost done describing a polygon (don't close it yet).  If
+    you don't have a middle mouse button, clicking on BOTH mouse
+    buttons at once will do it if you have "emulate third mouse
+    button" enabled in your X-Windows configuration.
+
+    Go to Map->Draw CAD Objects->Close Polygon.  The polygon will
+    get completed, the area enclosed will be computed, and a dialog
+    will pop up asking you for more information.  You do not have to
+    enter any information in this dialog, but a name of some type is
+    helpful in order to be able to identify each segment when
+    modifying/deleting/viewing these segments.
+
+    Note that these CAD Objects get saved in a file and reloaded
+    each time you start Xastir, but they cannot currently be written
+    out as a map file and used as a general map.
+
+    Note also that these CAD Objects don't get transmitted.  They
+    are currently for local display only.
+
+    The display of various kinds of data related to these segments
+    can be modified in the Map->Draw CAD Objects menu.  Modifying
+    parameters for any segment is done in the
+    Map->Draw CAD Objects->CAD Polygons dialog.
+
+    Click on the dashed line in the menus in order to separate that
+    menu from the rest and allow you to keep the menu on the screen.
+    This is very useful when drawing CAD Objects or changing
+    display/filtering options.
+
+    Turn off "Draw" mode when you're done.  The cursor should return
+    to normal.
+
+
+
+SUMMARY OF DISTANCE/AREA/ANGLE CALCULATIONS:
+
+
+    DISTANCE:
+    ---------
+    *) Haversine formula (2-parameter atan version) for computing
+    distance between two points, for our general distance routines:
+
+        calc_distance()
+        calc_distance_course()
+        distance_from_my_station()
+
+    *) Haversine formula (2-parameter atan version) in "Measure" for
+    both the X/Y offsets and the total distance.
+
+    Haversine formula is more accurate for shorter distances than
+    spherical trigonometry calculations.  Both methods are equivalent
+    for longer distances.  Both are Great-Circle calculations (as
+    opposed to Rhumb-line or planar geometry).  See the GIS FAQ for info
+    on these methods.  Dr. Math website mentions both of these and refers
+    people to the same GIS FAQ.
+
+    Also note that the Haversine formula is ill-conditioned if the
+    two points are antipodal (on opposite sides of the Earth).  From the
+    GIS FAQ: "but the error, perhaps as large as 2km (1 mi), is in the
+    context of a distance near 20,000km (12,000 mi)."  For our purposes
+    that's just fine.
+
+
+    AREA:
+    -----
+    *) Area of a spherical rectangle from Dr. Math's website for the
+    "Measure" function.  There are errors in their last two derived
+    formulas.  They have been notified of it.  Our implemented code
+    is correct.
+
+    *) The area calculation for CAD Object Polygons is probably not
+    spherical, but closer to planar.  It might take some doing to calculate
+    the area of irregular polygons on a spherical surface.  We use Greene's
+    Theorem to compute the area based on the vectors.  The lengths of each
+    vector are computed via the Haversine formula, so it's not strictly a
+    planar area calculation either.  Somewhere in-between planar and spherical?
+    This should be plenty good enough for areas that are less than 12 miles on
+    a side (that's about where planar geometry starts to diverge from spherical
+    trigonometry), perhaps also for somewhat larger areas than this due to the
+    advantage of computing the vector lengths with the Haversine formula.
+
+
+    ANGLE:
+    ------
+    *) Great Circle departure angle for the "Measure" function.
+
+    *) Great Circle departure angle for the calc_distance_course()
+    function.
+
+    *) Dead-reckoning angle is essentially a Rhumb-line calculation
+    (constant heading), with a few caveats:
+
+        We compute the next point along a constant angle based on the last
+        position transmitted, the time elapsed, and the course desired.
+        This then gets corrupted a bit either by the standard APRS grid that
+        it has to snap to (and the position snapped to for the previous
+        position) and/or by the relatively course angle available for Base-91
+        compressed positions.
+
+        Standard APRS positions give 1-degree angular resolution but 60-foot or
+        so grid points.  Base-91 Compressed positions give something like 1 to
+        3-foot grid points but less angular resolution (+/- 2 degrees.  We
+        can't win!
+
+        The end result is that we start off like a drunk sailer due to our
+        short transmit times and the above limitations, then the angle smooths
+        out as the time increases between the transmits.  You can see this
+        easily at zoom level 1 when you place an object, when you make a change
+        to an object, or move an object (transmit rate goes up for any of these
+        conditions).
+
+    Dead-reckoning effectively does a Rhumb-Line calculation as it is
+    trying to do a constant heading.  That means it is not the shortest
+    distance between the points.  I'm still trying to get my head around
+    that last concept as it is counter-intuitive to someone versed in
+    compass/maps on land and with shorter distances.
+
+    A Great-Circle route is the shortest distance between two points on
+    a sphere, whereas a Rhumb-line is what you get if you move along a
+    constant compass heading and is a bit longer.
+
+    We probably do not need to go to ellipsoid calculations for Xastir.
+    Spherical calculations should be easily accurate enough for what we do.
+ 
+
+
+  ------------------------------------------------------------------------
+APRS(tm) is a Trademark of Bob Bruninga
+
+Copyright (C) 1999 Frank Giannandrea
+Copyright (C) 2000-2012 The Xastir Group
+

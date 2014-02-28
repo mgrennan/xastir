@@ -1,0 +1,902 @@
+
+$Id: README.Getting-Started,v 1.45 2012/08/26 18:34:34 tvrusso Exp $
+
+
+Hello new user, and welcome to Xastir!
+
+
+This document will take you through the steps necessary to get
+Xastir up and running in one of the following configurations:
+
+
+1) Minimal install, which will get you up and running quickly.  It's
+   recommended that you try this configuration first then add to it.
+
+2) Typical install including maps, weather alerts, geo-coding files,
+   etc. so that full regular operation is achieved.
+
+3) Maximum install with all configure options enabled and most of
+   the useful maps loaded/enabled.  All the bells and whistles.
+
+
+Note that you can start with either of the first two options and add
+only the options you wish in order to come up with your own custom
+configuration of Xastir.
+
+These instructions are written for Linux users.  Windows users
+should refer to the README.win32 document instead.
+MacOSX/Solaris/FreeBSD users should refer to the README document
+first, then the INSTALL document and the below instructions for
+further notes.
+
+One question you might ask is whether you can just find a binary on
+the 'net somewhere and install it instead of compiling Xastir from
+sources.  Yes, this is possible.  Xastir changes so often (bug fixes
+and of course adding new features) that you're really limiting
+yourself by using pre-compiled binaries.  Binaries are typically not
+updated all that often, if at all, so you'll forever be behind the
+curve.
+
+Another reason to compile from sources is to customize it to use all
+of the features you have available on your system.  As you add more
+libraries that Xastir can use, you can do a quick
+configure/compile/install and Xastir will be able to take advantage
+of them.
+
+For those that really must have the latest-latest:  Download the
+Xastir sources using CVS instead, then issue the command "cvs
+update" periodically in order to snag the latest changes.  If
+anything comes down the pipe, just configure/make/install and then
+use the latest version.  This avoids large file downloads (after the
+initial download) as it just grabs _changes_ to the sources off the
+'net each time you issue the "cvs update" command.  This is the
+power-user's method of keeping Xastir up-to-date.  See README.CVS
+for details.
+
+After the three configuration sections there's a section on
+operating, which simply talks you through the initial configuration
+settings and how things work.  After that you can refer to the Help
+menu option in Xastir itself, plus the INSTALL and README.* text
+files for additional information.  Please note that the non-English
+help files lag severely behind the English help file.
+
+First of all, NEVER RUN XASTIR AS THE ROOT USER!  You're risking the
+security of your system by attempting it.  Create another regular
+user on your system and use that user for all of your normal
+activity.  This goes for any other normal activity on the system as
+well.  Only use the "root" account for maintenance activities, not
+for regular user activities.  You'll thank me later!
+
+Before we begin, consider subscribing to the Xastir mailing list.
+That's where everyone is kept up-to-date on the latest features,
+plus lots of questions are asked/answered there on a weekly or
+sometimes daily basis.  It's a great way to learn and to stay
+connected with the other Xastir users.  See the mailing links on the
+left of the Xastir home page:  http://www.xastir.org
+You must be subscribed in order to post messages there.
+
+So...  Let's get started!
+
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+
+Latest info:
+
+*) Xastir starts up with a default world map the first time you run
+it plus pops up a dialog where you can enter your callsign.  Enter
+a callsign, then close/restart Xastir or save the configuration via
+"File->Configure->Save Config Now!".  Either of these methods saves
+the callsign to disk.
+
+*) Xastir includes "Shapefile" map capability by default.  Run the
+script:
+
+    "/usr/local/share/xastir/scripts/get-NWSdata"
+
+as root to download/install NOAA Shapefile maps using the "wget"
+utility.  You'll of course need wget installed in order to fetch the
+files using this method.  Installing the NWS files enables weather
+alert support in Xastir.  Verify that "Map->Enable Weather Alerts" is
+selected and that "Map->Disable All Maps" is _not_ selected, else
+you won't see weather alerts on your screen.
+
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+
+Sources of help you may find useful:
+
+*) "FAQ" file
+
+*) "INSTALL" file:  Non-Windows instructions for installing Xastir
+   and optional map libraries may be found here.
+
+*) "README" file:  General info and some OS-specific notes.
+
+*) "README.Contributing" file:  Info on how to contribute to the
+   Xastir project.
+
+*) "README.CVS" file:  Info on a more advanced way to keep up-to-date
+   on the latest Xastir sources.
+
+*) "README.Getting-Started" file:  The file you're reading.
+
+*) "README.MAPS" file:  Much of the info about maps and where to get
+   them may be found here.  Also see the Xastir Documentation
+   section, the Wiki pages, at <http://www.xastir.org>
+
+*) "README.win32" file:  For Windows/Cygwin users.
+
+*) "UPGRADE" file:  Useful info for updating some old versions of
+   Xastir.
+
+*) Xastir Web-based documentation, including a set of Wiki pages,
+   found at <http://www.xastir.org>
+
+*) Xastir man page, accessed by typing "man xastir" on a Unix or
+   Unix-like system.  This page is a bit out-of-date.
+
+*) "Help->Help Index" in the Xastir program itself.  Note that only
+   the English language variation of this is somewhat up-to-date.
+
+*) Mailing lists at <http://www.xastir.org>
+
+*) User forums at <http://www.xastir.org>
+
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+
+Minimal Install:
+----------------
+
+First, let's describe it:  This will get Xastir up and running with
+a few built-in map types.  You'll be on the air or on the 'net
+quickly, then can build upon this working base to add more map
+libraries and other cool features later.
+
+
+Getting the package:
+--------------------
+*) Option 1:  Download one of stable or development snapshots from
+http://www.xastir.org.  There are links from that page or you can go
+to the SourceForge page and click on Files to see the entire set
+that is available.
+
+Once you have the file, create a subdirectory for it to reside.  I
+usually do this:
+
+    cd                      # Go to my home directory
+    mkdir src               # Make a "src" subdirectory
+    cd src                  # Change to it
+    mkdir xastir            # Make an "xastir" subdirectory
+    cd xastir               # Change to it
+    cp /path/filename .     # Copy the downloaded file here
+    tar xzvf filename       # Un-archive the sources
+
+That last step will create yet another xastir directory underneath
+the first one but will have the version number in it, so your full
+path might be something like (starting at your home directory):
+~/src/xastir/xastir-1.7.0
+
+The path just listed is where you'll go in order to run the
+configure and make commands listed below.
+
+    cd  ~/src/xastir/xastir-1.7.0
+
+from an xterm window should take you there.
+
+*) Option 2:  An alternative is to use CVS to snag the sources for
+you.  Using this method you can periodically update to the latest
+released version, the latest "stable" version, or the latest
+development sources.  See README.CVS for info about that option.
+One of the advantages of CVS is that you only pull down the changes
+since you last updated, instead of doing very large file downloads
+each time.  Another advantage is that you can keep up with the
+latest features on a daily basis if you wish, nearly effortlessly.
+
+
+Configure:
+----------
+In order to complete the configure/compile/install of Xastir, you'll
+need some of the development tools and headers installed.  Here's a
+list of a few items you'll need to have installed.  Look for them in
+the development tools sections on your Linux distribution:
+
+
+    bash
+    binutils
+    gcc
+    gcc development headers
+    cpp
+    glibc
+    glibc development headers?
+    freetype2
+    freetype2 development headers
+    openmotif (or Lesstiff or Motif)
+    openmotif development headers (or Lesstiff or Motif)
+    XFree86
+    XFree86 development headers
+    XFree86 fonts
+    XFree86 libraries
+    make (GNU flavor, not BSD flavor)
+    gzip
+    m4
+    grep
+
+
+Note:  Only install one of the Motif packages and the corresponding
+development package to go with it.  Recommendation:  OpenMotif.
+
+If you'd like to install additional packages at this point that may
+be needed later, install these as well:
+
+
+    patch
+    diffutils
+    perl
+    autoconf
+    automake
+    less
+    bzip2
+    curl
+    curl development headers
+    cvs
+    rcs
+    tar
+    liblcms
+    liblcms development headers
+    libtiff
+    less
+    pcre
+    pcre development headers
+    tcl
+    tcl development headers
+    tk
+    zip
+    unzip
+    wget
+    ax25-apps
+    ax25-doc
+    ax25-tools
+    libax25
+    festival
+    festival development headers
+    gawk
+    ghostscript-x11
+    ghostscript-fonts
+    ghostview
+    gv
+    ImageMagick
+    ImageMagick development headers
+
+
+Note that some packages may have dependencies on yet more packages.
+Hopefully your package installation tool will take care of those for
+you.  It's also common for at least one of these packages to forget
+to list some of it's dependencies (ImageMagick is known for that).
+In that case you may have to rely on the compiler to tell you what
+is missing, then go back and re-install a package or two.
+
+When you run the "./configure" step from the "xastir" directory, the
+script will attempt to figure out what facilities are available that
+Xastir can take advantage of.  Sometimes the script guesses wrong
+and you must disable an option and try again.  The correct way to do
+this is (Festival speech synthesizer is used as an example, not that
+I'm picking on Festival or anything):
+
+    ./configure --without-festival
+
+That will guarantee that configure will skip Festival entirely,
+which will set up the Makefiles to skip it, and the Xastir binary
+will be created without any support for it.  Other configure options
+are:
+
+    --without-ax25
+    --without-festival
+    --without-gpsman
+    --without-shapelib
+    --without-imagemagick
+    --without-libproj
+    --without-geotiff
+    --without-gdal
+    --without-pcre
+    --without-dbfawk
+    --without-map-cache
+    --with-errorpopups
+    --with-rtree
+
+
+That said, you probably won't have to use any of these!  Type
+"./configure" all by itself and the script should eventually give
+you a summary of the packages that it will try to compile support
+into Xastir for.  The only time you may want to add some of the
+above options is if the compile hangs up because of one of them.
+You can then add the option to configure, re-create the Makefiles to
+skip that feature, and get Xastir compiled without it.  Once you get
+the problem solved, you can reconfigure and recompile to add that
+feature back in.
+
+At this point, if some things don't appear in the summary that you'd
+like/expect to appear, as long as you get to the "Type 'make' to
+build Xastir" message, you're doing fine.  You can work on getting
+more things in there later.
+
+This is what you'd like to see at the end of the "./configure" run
+(minimum, there may be more "yes" answers):
+
+  AX25.......... : no
+  Festival...... : no
+  GPSMan........ : no
+  ImageMagick... : no
+  libproj....... : no
+  GeoTiff....... : no
+  GDAL/OGR...... : no
+  ShapeLib...... : no
+  pcre.......... : no
+  dbfawk........ : no
+  libgc (Debug). : no
+
+In other words, Xastir should build/compile with NO optional
+libraries installed!  This will still give you USGS GNIS maps,
+APRSdos maps, WinAPRS maps, and PocketAPRS maps, plus audio alerts
+if you have a suitable audio player installed on your system.
+You'll also be able to attach a TNC either in command-line or KISS
+mode and connect it to Xastir.  Mobile support will work with an
+attached serial GPS.  Attached weather stations should work fine
+too.  You won't get online maps or weather alerts with this
+configuration though.  Worry about that stuff later once you get the
+minimal configuration working.
+
+
+Make:
+-----
+Type "make".  That stage should complete with no errors.  You may
+have a warning or two show up, depending on your compiler version
+and your operating system.
+
+
+Make install:
+-------------
+For this stage you need to have root privileges.  "root" is the
+user on a Unix/Linux box that has the ultimate authority over
+everything.  Follow these steps:
+
+    su
+    make install
+    chmod 4755 /usr/local/bin/xastir (optional, see below)
+    exit
+
+The first step takes you to root user privileges.  You'll need to
+type in the root password when it asks for it.  The "make install"
+step installs all of the pieces of Xastir in the appropriate places
+on your system.
+
+The "chmod" step sets up the Xastir executable so that it can assume
+root privileges at the points where it needs to, usually when it
+needs to access serial ports or AX.25 kernel networking ports.  Note
+that if you don't need the above chmod command, don't use it.  It
+will prevent creation of "core" files in case Xastir crashes, which
+makes debugging to figure out the root cause much more difficult.
+There are also some security risks in doing "chmod 4755", as it
+makes Xastir run as the root user at times.  We've tried to minimize
+the risk by giving up root permissions when we don't absolutely
+require them, so the risks are smaller.
+
+At this point you have a minimal Xastir installed.  Jump down to the
+"Operating Xastir" step below.
+
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+
+Typical Install:
+----------------
+
+First, let's describe it:  This will give you a working Xastir with
+local Shapefile maps, online street/topo/satellite-image maps,
+weather alerts, and audio alerts.  Optionally you can add
+synthesized speech to the mix.
+
+You'll need to run /usr/local/share/xastir/scripts/get-NWSdata as root
+after you do the install in order to get the NOAA data files you'll
+need for the weather alerts.  "get-NWSdata" requires "wget" in order
+to work.
+
+This is what you'd like to see at the end of the "./configure" run
+(minimum, there may be more "yes" answers):
+
+
+-------------------------------------------------------------------
+  MINIMUM OPTIONS:
+    ShapeLib (Vector maps) ................. : yes
+
+  RECOMMENDED OPTIONS:
+    GraphicsMagick/ImageMagick (Raster maps) : yes (GraphicsMagick)
+    pcre (Shapefile customization) ......... : yes
+    dbfawk (Shapefile customization) ....... : yes 
+    rtree indexing (Shapefile speedups) .... : no
+    map caching (Raster map speedups) ...... : no
+    internet map retrieval ................. : yes (libcurl)
+
+  FOR THE ADVENTUROUS:
+    AX25 (Linux Kernel I/O Drivers) ........ : no
+    libproj (USGS Topos & Aerial Photos) ... : no
+    GeoTiff (USGS Topos & Aerial Photos) ... : no
+    Festival (Text-to-speech) .............. : no
+    GDAL/OGR (Obtuse map formats) .......... : no
+    GPSMan/gpsmanshp (GPS downloads) ....... : no 
+-------------------------------------------------------------------
+
+
+Note:  You may see "ImageMagick" instead of "GraphicsMagick" and/or
+"wget" instead of "libcurl" for your installation of Xastir.  Those
+are alternative packages that give similar functionality.  You may
+also see "(internal)" at the end of the Shapelib line, which is fine
+also.
+
+
+TBD
+
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+
+Maximum Install:
+----------------
+
+First, let's describe it:  This will give you a working Xastir with
+all of the non-debug "configure" options enabled, local maps, online
+street/topo/satellite-image maps, weather alerts, audio alerts,
+synthesized speech, Garmin RINO support, GPS download support,
+search for street address capability, FCC/RAC callsign lookups, and
+all of the supported map types.
+
+This is what you'd like to see at the end of the "./configure" run:
+
+
+-------------------------------------------------------------------
+  MINIMUM OPTIONS:
+    ShapeLib (Vector maps) ................. : yes
+
+  RECOMMENDED OPTIONS:
+    GraphicsMagick/ImageMagick (Raster maps) : yes (GraphicsMagick)
+    pcre (Shapefile customization) ......... : yes
+    dbfawk (Shapefile customization) ....... : yes
+    rtree indexing (Shapefile speedups) .... : yes
+    map caching (Raster map speedups) ...... : yes
+    internet map retrieval ................. : yes (libcurl)
+
+  FOR THE ADVENTUROUS:
+    AX25 (Linux Kernel I/O Drivers) ........ : yes
+    libproj (USGS Topos & Aerial Photos) ... : yes
+    GeoTiff (USGS Topos & Aerial Photos) ... : yes
+    Festival (Text-to-speech) .............. : yes
+    GDAL/OGR (Obtuse map formats) .......... : yes
+    GPSMan/gpsmanshp (GPS downloads) ....... : yes
+-------------------------------------------------------------------
+
+
+Note:  You may see "ImageMagick" instead of "GraphicsMagick" and/or
+"wget" instead of "libcurl" for your installation of Xastir.  Those
+are alternative packages that give similar functionality.  You may
+also see "(internal)" at the end of the Shapelib line, which is fine
+also.
+
+
+TBD
+
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+
+Operating Xastir:
+-----------------
+
+Again, NEVER RUN XASTIR AS THE ROOT USER!  You're risking the
+security of your system by attempting it.  Create another regular
+user on your system and use that user for all of your normal
+activity.  This goes for any other normal activity on the system as
+well.  Only use the "root" account for maintenance activities, not
+for regular user activities.  You'll thank me later!
+
+Assuming you want to start Xastir up in the English language, you
+can type (from an xterm window):
+
+    xastir
+
+which will start up the program without giving you back a
+command-prompt in your xterm window (until Xastir exits), or you can
+type (from an xterm window):
+
+     xastir &
+
+which will start Xastir in the background, giving you back your
+xterm for more commands.  The typical way to start it is with
+"xastir &".  Of course you can get fancier and attach it to your
+window manager's menus or create an icon on your desktop which
+starts it.  Those are operating system/window manager-specific, so
+we won't cover how to do that here.
+
+The first time you start Xastir it will show a default map of the
+world plus pop up the File->Configure->Station dialog.  Enter a
+callsign on that dialog and press the OK button.
+
+
+Changing the Language:
+
+If you want to start Xastir using some other language, you do that
+with command-line switches when you start Xastir.  Once you use one
+of these switches, that language option becomes "sticky", meaning
+you won't have to enter that command-line switch again unless you
+wish to change languages.
+
+There are some command-line switches that you can 
+If you type "xastir -?", which is an invalid command-line option,
+you'll see this:
+
+  xastir: invalid option -- h
+
+  Xastir Command line Options
+
+  -c /path/dir       Xastir config dir
+  -f callsign        Track callsign
+  -i                 Install private Colormap
+  -geometry WxH+X+Y  Set Window Geometry
+  -l Dutch           Set the language to Dutch
+  -l English         Set the language to English
+  -l French          Set the language to French
+  -l German          Set the language to German
+  -l Italian         Set the language to Italian
+  -l Portuguese      Set the language to Portuguese
+  -l Spanish         Set the language to Spanish
+  -l ElmerFudd       Set the language to ElmerFudd
+  -l MuppetsChef     Set the language to MuppetsChef
+  -l OldeEnglish     Set the language to OldeEnglish
+  -l PigLatin        Set the language to PigLatin
+  -l PirateEnglish   Set the language to PirateEnglish
+  -m                 Deselect Maps
+  -p                 Disable popups
+  -t                 Internal SIGSEGV handler enabled
+  -v level           Set the debug level
+
+
+Ignore those for now unless you need to change the Language.
+
+OK, Xastir should show up on your screen at this point.  We're
+assuming that you're already running X-Windows graphical environment
+at this point.  If you're in command-line Linux/Unix only, Xastir
+won't run.
+
+If you've configured in ShapeLib capability, you'll need to run
+/usr/local/share/xastir/scripts/get-NWSdata as the root user in order
+to get the NOAA data files you'll need for the weather alerts.  The
+script requires "wget" in order to work.  Run this script periodically
+(once every six months perhaps?) to keep your weather alert maps
+up-to-date.  If you're not in the U.S. or one of it's possessions then
+you can safely ignore this download.
+
+
+Various ways to manipulate Xastir:
+
+
+Context-Dependent Operations:
+-----------------------------
+                Normal      Draw-CAD    Measure     Move
+                ------      --------    -------     ----
+Cursor          Arrow       Pencil      Crosshairs  Crosshairs
+LeftClick                                           SelectObject
+LeftDrag        ZoomToArea  ZoomToArea  MeasureArea MoveObject
+MiddleClick     ZoomOut     SetCADPoint ZoomOut     ZoomOut
+
+Alt-F, Alt-V, etc to bring up main menus via the keyboard.  Use
+arrow keys to navigate menus and/or single letters corresponding to
+the "hot" letter (underlined lettter) for each menu item.
+
+"ESC" to back out of the menu system.
+
+
+Global Operations:
+------------------
+LeftClick       Select Menu or GUI Item (when in menus or dialogs)
+LeftDblClick    FetchAlertText (when in View->Wx Alerts dialog)
+RightClick      OptionsMenu
+Home            Center the map on your home station
+PageUp          ZoomOut
+PageDown        ZoomIn
+ArrowUp         PanUp
+ArrowDown       PanDown
+ArrowLeft       PanLeft
+ArrowRight      PanRight
+"="             GridSize++
+"+"             GridSize++
+"Num+"          GridSize++
+"-"             GridSize--
+"Num-"          GridSize--
+"Space"         Activate current widget
+"Tab"           Rotate among widgets
+"Back-Tab"      Rotate among widgets backwards
+
+
+Other Possible External Stimuli:
+--------------------------------
+Send a SIGUSR1 to cause a snapshot to be taken.
+Send a SIGHUP to cause Xastir to save/quit/restart.
+Send a SIGINT, SIGQUIT, or SIGTERM to cause Xastir to quit.
+Connect to TCP port 2023 if Server Port is enabled to send/receive packets.
+Send to UDP port 2023 via the xastir_udp_client program to inject packets.
+
+
+Note that you can also tweak a define/recompile to reverse the
+left/right button functions.
+
+
+
+Configuring Xastir:
+-------------------
+*) Note that the menu's have a dashed line near the top.  If you
+click on that dashed line it acts like a cut-line for the menu and
+detaches that menu from the main menu.  You can then move that menu
+off to another area of your screen.  You might try that with the
+File->Configure menu at this time.
+
+*) Go to File->Configure->Station and set your callsign.  Set up
+other parameters/comment fields on this dialog that may need
+setting.
+
+*) Go to File->Configure->Defaults and set parameters there.
+
+You have the main parameters set now.  Next is to enable some
+interfaces so that you can see some packets come across.  Easiest
+might be the Internet interfaces, assuming the computer you're on
+has Internet access and is hooked up to it currently.
+
+*) Run "callpass" in another Xterm window in order to generate your
+Pass-code number.  Save that number as you'll need it for each
+Interface dialog where you might need to authenticate your callsign.
+Of course you can always run callpass again if you forget it!
+
+*) Go to Interface->Properties then click on "Add".  Click "Internet
+Server".  Another dialog will come up that allows you to enter the
+Host, and the Port.  Enter your Pass-code number here.  People often
+check the "Activate on Startup?" and the "Reconnect on NET failure?"
+options on this box.  You may also assign a comment to this
+interface which describes the interface better for you.  Click "OK"
+to create the interface.  If you checked "Activate on Startup?" then
+the interface will start as well and you'll be receiving packets.
+
+Browse "http://www.aprs2.net/" to find a reasonable set of servers
+to start with.  Another possibility is to use "rotate.aprs2.net"
+port 14580, which theoretically should rotate among the available
+second-tier servers.  See "http://www.aprs2.net" for more info.
+You'll need to put in a filter string, such as "r/35/-106/500" which
+shows you stations that are within 500km of 35dN/106dW (Thanks for
+that one Tom!).  For additional filter settings check out:
+
+    http://www.aprs-is.net/javaprssrvr/javaprsfilter.htm
+
+*) Start that interface from the Interface->Start/Stop dialog if
+it's not started already.  You'll see icons in the lower right
+toggling and see callsigns in the lower left status box if packets
+are coming in.
+
+One thing about configuration:  Most things don't get written to
+Xastir's config file until you choose either "File->Configure->Save
+Config Now!" or you exit Xastir.  Map Selections however are
+immediate.
+
+*) Creating/starting interfaces for other types of devices is
+similar.  If you're wanting to create AX.25 kernel networking ports
+you'll have to refer to the HAM HOWTO documents and perhaps the
+linux-hams mailing list for help.  For AGWPE connections refer to
+that AGWPE docs and mailing list.
+
+It's recommended that if you run a local TNC, you run it in KISS
+mode.  You can do that via the Serial KISS TNC interface, or via
+AX.25 Kernel Networking ports.
+
+Some of the more esoteric types of interfaces may require some
+questions on the Xastir list.  Don't be afraid to ask them as we've
+all been there before.
+
+
+A Note About Paths:
+-------------------
+New path methods were discussed early April, 2005, and are being
+implemented world-wide:
+
+    "WIDE2-2" for fixed stations, balloons, aeronautical-mobile
+    "WIDE1-1,WIDE2-1" for mobiles/portables
+
+With this system, "WIDE1-1" has replaced "RELAY".  Never use
+"WIDE1-1" in anything but the first path slot.  "RELAY", "WIDE",
+"TRACE", and "TRACEn-N" are deprecated and should not be used
+anymore.
+
+If you want to insert a single hop callsign later in the path use
+"WIDE2-1" instead, for example:  "WIDE1-1,WIDE2-1" will go exactly
+two hops and use _either_ home fill-in digi's or mountaintop digi's
+for the first hop, mountaintop digi's only for the second hop.
+
+Home fill-in digi's (only where absolutely needed) should be set up
+to respond to "WIDE1-1" instead of "RELAY".
+
+
+A Note About the Map Directory:
+-------------------------------
+The map directory (/usr/local/share/xastir/maps/) is free-form,
+meaning you can have links in there, subdirectories, etc.  Organize
+it in any way that makes sense to you.  From within the Map Chooser
+you can select a directory name, which will select every map
+underneath that directory, so keep that in mind while organizing
+your maps.
+
+
+Enabling Weather Alerts:
+------------------------
+You must have Shapelib compiled into Xastir.  Xastir now comes with
+Shapelib support built-in.  PRCE/dbfawk are optional.  Install NOAA
+shapefile maps as specified in README.MAPS.  These files must be
+installed into the /usr/local/share/xastir/Counties/ directory.  You
+may use this script to download/install them for you:
+    
+    "/usr/local/share/xastir/scripts/get-NWSdata"
+
+which must be run as the root user, and requires "wget" to work.
+
+A neat trick:  You can copy some of these maps into the
+/usr/local/share/xastir/maps directory somewhere (a new subdirectory
+under there is always fine), then you can select some of these maps
+as regular Xastir maps as well.
+
+
+Enabling FCC/RAC Callsign Lookup:
+---------------------------------
+
+Run the /usr/local/share/xastir/scripts/get-fcc-rac.pl script as root,
+which will download and install the proper databases into the
+/usr/local/share/xastir/fcc/ directory.  At that point the callsign
+lookup features in the Station Info dialog and in the "Station->Find
+Station" menu option should be functional.
+
+
+Enabling Map Feature Lookup:
+----------------------------
+Install USGS GNIS files into the /usr/local/share/xastir/GNIS/
+directory.  Call out the proper file when invoking the "Map->Locate
+Map Feature" menu option.  Note that if you also link a subdirectory
+name under the maps directory back to the
+/usr/local/share/xastir/GNIS/ directory, you'll be able to use the
+GNIS files as maps under the Map Chooser as well.  See README.MAPS
+for how to do this.
+
+
+Enabling Street Address Lookup:
+-------------------------------
+Download the USA.geocode file and install it into the
+/usr/local/share/xastir/GNIS/ directory.  This will enable the
+"Map->Find Address" menu option to work.  Xastir will place a big
+"X" on the map at the street address it finds for you.  This file is
+sometimes available at http://www.dementia.org/geocoder/tgr2003/
+As an alternative you can download the individual state files that
+are located there.
+
+
+Enabling Audio Alarms:
+----------------------
+Download and install sample audio files from Xastir's SourceForge
+download site.  Install the audio files in
+/usr/local/share/xastir/sounds/ directory.
+
+Install a command-line audio player.  Call out the path/name of that
+player in the File->Configure->Audio Alarms dialog.  Common ones are
+vplay and auplay, but there are many others.  Enable the types of
+alarms you desire in that same dialog.
+
+You should be able to test it manually from a shell by typing the
+command in something like this:  vplay filename
+
+Once you find a command that works, type it into Xastir's Audio
+Alarms dialog exactly the same except omit the filename.
+
+
+Enabling Synthesized Speech:
+----------------------------
+*) MacOSX
+    TBD
+
+*) Windows
+    TBD
+
+*) Linux/FreeBSD/Solaris
+Install the Festival Speech Synthesizer.  Configure/compile support
+for it into Xastir.  Start up the Festival server before starting
+Xastir.  Xastir should start up and connect to the server.  Use the
+options in File->Configure->Speech to decide which things you'd like
+Xastir to speak to you about.
+
+Note that the Proximity Alert option in the File->Configure->Speech
+dialog uses the distances set in the File->Configure->Audio Alarms
+dialog.
+
+
+Enabling GPS Waypoint/Track/Route Download Support:
+---------------------------------------------------
+Install GPSMan and gpsmanshp.  Configure/compile support for it in
+Xastir.  Start up GPSMan separately and configure it for your GPS
+and serial port.  You'll see download options for each type on the
+Interface menu.
+
+Note that Xastir requires a version of gpsman at least as recent as 6.1.  Older
+versions of gpsman may not work.
+
+
+Enabling Garmin RINO Support:
+-----------------------------
+Install GPSMan (and gpsmanshp if you wish normal GPS download
+support as well).  Configure/compile support for it in Xastir.
+Start up GPSMan separately and configure it for your GPS and serial
+port.  In the "File->Configure->Timing" dialog you'll see an option
+for "RINO -> Objects Interval".  That sets the interval at which
+Xastir will download waypoints from an attached RINO unit.  Any
+waypoints that begin with "APRS" will have the "APRS" chopped off,
+and the remaining name will be used to create APRS(tm) Objects.  Those
+objects will be plotted on the map and transmitted as well if
+transmit for objects/items is enabled.
+TBD
+
+
+Transmit Enable/Disable Options:
+--------------------------------
+Each interface has a separate transmit enable.  The Interface menu
+also has a few global transmit enables.  All of these must be
+enabled for a particular interface to transmit.  Also, for Internet
+servers, you typically need to authenticate with the server using
+your callsign/pass-code before you're allowed to inject packets into
+the Internet stream which may get gated out to RF.  If you just want
+to talk to other Internet users, you don't need a pass-code to
+authenticate to the servers.
+
+
+Igating Options:
+----------------
+There are igating options on each local TNC interface.  There are
+other global igating options on the File->Configure->Defaults
+dialog.  The global option sets restrictions on all igating.
+
+
+Where stuff is kept:
+-------------------- 
+
+Per-user configurations are kept in each user's ~/.xastir directory, by
+default.  In particular the ~/.xastir/config/xastir.cnf file is where most
+of the configs are kept.  This directory can be optionally specified using
+the -c /path/dir command line option.  Make sure you specify a directory,
+not a file!  Xastir will create the directory and several subdirectories if
+they do not exist when you start up. 
+
+A few executables are installed in /usr/local/bin/.
+
+Scripts are installed in /usr/local/share/xastir/scripts.
+
+Maps are installed in /usr/local/share/xastir/maps/.  Lots of other
+directories are under /usr/local/share/xastir/.
+
+
+More?
+-----
+Anything else?  Let's hear about what's still confusing or needs to
+be expanded in this document.  Thanks!
+
+
+APRS(tm) is a Trademark of Bob Bruninga
+
+Copyright (C) 2005-2012 The Xastir Group
+

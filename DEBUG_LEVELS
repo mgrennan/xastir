@@ -1,0 +1,123 @@
+
+$Id: DEBUG_LEVELS,v 1.18 2012/11/01 18:57:18 we7u Exp $
+
+This file has three parts.  The first part describes the new structure for
+debug levels.  The second part describes the debug_level definitions that
+were in the old code and which files they were in.  The third part
+describes how to use use debugging at run time.  The debug level structure
+was modified in February of 2002 by KB6MER.  Questions/comments/flames can
+be sent to kb6mer@arrl.net
+
+Here's how things are after KB6MER tweaked it all...
+
+New Scheme:
+-----------
+1       General basic debugging (any system)
+2       Messages, WX, Objects, and Items, Port Data Flow
+4       X Object Debugging
+8       X Window Object Debugging
+16      Map Debugging (maps.c)
+32      Language Debugging (maps.c)
+64      Database Object Debugging
+128     GPS Interface Detailed debugging
+256     station and trail display detailed debugging
+512     Map import/export function debugging
+1024    Internet Transaction debugging
+2048    ALOHA radius and Multipoint object debugging.
+
+4096    Levels 4096 and above will require modification to the
+        main.c:Change_debug_level_change_data() function to change
+        the bounds checking, and are available for future use.
+
+------------------------------------------------------------------
+
+Old Scheme:
+-----------
+Places where debug level is referenced in old code, and the levels
+referenced (if debug_level xx), where xx is >0, &1, etc.
+
+alert.c >0
+bulletin_gui.c &1
+db.c >=2 &1 &128 &32 &256 ()
+gps.c &128
+hostname.c &256
+igate.c &2
+interface.c &128 &2 &1
+interface_gui.c &128
+lang.c &32
+main.c &4 <0/>255(need to change limits) &8 &128 &1 &15
+maps.c &16 &2 >=2 &4 &1 &8
+messages.c >1 &1 >5
+messages_gui.c &2
+track_gui.c >=2
+util.c &1
+wx.c >2 &1
+xa_config.c &1 &2
+
+
+
+
+------------------------------------------------------------------
+
+How to Use the Debug Levels
+
+Xastir debugging is turned on at run time by using the "-v" command line
+option and/or the File -> Configure -> Change Debug Level pull-down. 
+ 
+As laid out above, in the source code, debugging output is turned on by a
+bitwise "and" (&) of the currently set DEBUG_LEVEL against a number
+appropriate to the module currently being executed. 
+
+For example, in the "maps.c" the following lines appear: 
+
+    if ( debug_level & 512 )
+        fprintf(stderr,"Creating %s\n", xpm_filename );
+
+The highest debug level for Xastir is 4095, and debug levels are additive. 
+If you want to have "general basic debugging" and "GPS interface Detail"
+and "Map Debugging" you'd use:
+
+1 + 128 + 512 = 641
+
+xastir -v 641 
+
+Debug information typically is sent to "standard error" - which is normally
+File Descriptor #2 in Unix parlance.  Using common Unix shells, such as
+Bash, you can "redirect" the output to be intermingled with the "standard
+output" (file descriptor #1).  This allows you to get all of the normal
+output, plus all of the debug output in one stream, which can be "piped" to
+another command, such as grep.  This can used to search for specific items
+in the debug output. 
+
+For example, to check debug information to see whether or not map caching
+is working, you can turn on debug level 512, redirect stderr to stdout and
+the grep for map cache specific output:
+
+xastir -v 512 2>&1 |grep map_cache
+
+Another little trick, to be used when you're running programs that
+call other programs, or scripts that call other scripts/programs:
+
+    (xastir -v 512 2>&1) | grep map_cache
+
+The parenthesis cause that portion to be run in a sub-shell, and then
+that sub-shell's STDERR is piped to STDOUT by the "2>&1" portion, so
+you get ANYTHING that went to STDERR or STDOUT from that command or
+anything that it calls.  This is how you can get a "make" command to
+spit everything into one file.
+
+Of course you can also do:
+
+    (xastir -v 512 2>&1) | tee xastir.log
+
+Which will pipe everything to your screen and to the xastir.log
+file.  You could then type "tail -f xastir.log | grep map_cache" in
+another window and watch that subset of the error messages there.
+That way you won't miss anything.
+
+
+
+
+------------------------------------------------------------------
+Copyright (C) 2002-2012 The Xastir Group
+

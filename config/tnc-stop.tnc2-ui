@@ -1,0 +1,12 @@
+# $Id: tnc-stop.tnc2-ui,v 1.8 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2004-2012  The Xastir Group
+#
+# This is the TNC Startup file for the TNC2-UI TNC.
+# lines that begin with a pound sign are comments.
+
+MONITOR OFF
+LF ON
+ECHO ON
+MONITOR ON
+

@@ -1,0 +1,76 @@
+# $Id: tnc-startup.kpc3,v 1.22 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2000-2012  The Xastir Group
+#
+# This is the TNC Startup file for Kantronics TNC.
+# lines that begin with a pound sign are comments.
+#
+# This configuration sets up Control-E mode for a KPC-3+ (GPS
+# connected to the 2nd serial port).  When Xastir is actively
+# getting GPS fixes, the TNC beacons only what Xastir sends to it.
+# When Xastir stops getting GPS data from the TNC, the TNC will
+# revert to dumb-tracker mode and start sending NMEA strings out all
+# by itself at a 20-minute rate.  If the GPS get disconnected or
+# turned off, the dumb-tracker mode will cease to send out beacons.
+# This last function is done by the "CLEAR" parameter for the BLT
+# commands.
+#
+# Some people prefer to turn off the GPS but still have the TNC
+# beacon their last good GPS position when in dumb-tracker mode.
+# To do this, remove the "CLEAR" parameters from the BLT command
+# lines.
+#
+
+int terminal
+
+# Clear out the LT buffers so we don't have old data in there:
+LT 1
+LT 2
+LT 3
+LT 4
+# Clear out the buffer regularly to prevent stale data:
+BLT 1 00:20:00 CLEAR
+BLT 2 00:20:00 CLEAR
+BLT 3 00:00:00
+BLT 4 00:00:00
+# Set up the NMEA strings to capture:
+GPSHEAD 1 $GPRMC
+GPSHEAD 2 $GPGGA
+#
+GPSPORT 4800 NORMAL CHECKSUM
+LGETCHAR $05
+#
+HID off
+#CWID every 0
+#
+# Important!  Only uncomment if really needed as a fill-in digi:
+#MYAlias WIDE1-1
+#
+B E 0
+DIGI on
+ECho off
+FILT off
+FLow off
+FUll off
+HEA off
+LFadd off
+LFSup ON
+AUTOLF off
+MCOM off
+MON ON
+MResp OFF
+MRPt on
+MSTamp off
+MXMit off
+NEWmode off
+#PACLen 128
+PASSALL off
+#
+# Important!  Monitor only PID 0xf0 packets:
+PID off
+#
+SCR 0
+# B E 0 must be set to 0 or both APRS and your TNC will send BCNS
+# Which will alternate in everyones L and A lists and fill up
+# their logs.  Do NOT set B E to anything other than 0 while APRS
+# is running.

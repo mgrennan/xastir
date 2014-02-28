@@ -1,0 +1,15 @@
+# $Id: stored_track.dbfawk,v 1.3 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2009-2012  The Xastir Group
+#
+
+
+BEGIN {
+dbfinfo="Credits:DateTime:Label;
+dbffields="Label:DateTime";
+}
+
+BEGIN_RECORD {key=""; lanes=3; color=12; name=""; filled=0; pattern=0; display_level=65536; label_level=256; label_color=12; symbol=""}
+
+/^Label=(.*)$/ {name="$1";}
+/^DateTime=(.*)$/ {name="$name ($1)";}

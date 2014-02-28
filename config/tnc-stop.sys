@@ -1,0 +1,9 @@
+# $Id: tnc-stop.sys,v 1.9 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2000-2012  The Xastir Group
+#
+#TNC STOP FILE
+# Undo any settings make in tnc-startup.sys
+# Edit this file for your tnc!
+UNPROTO CQ
+AUTOLF ON

@@ -1,0 +1,327 @@
+
+$Id: README.Contributing,v 1.21 2012/11/01 18:57:18 we7u Exp $
+
+
+Hello possible new developer, and welcome to the Xastir project!
+
+In order to get contributed patches accepted more easily by the
+Xastir developers:
+
+*) Read "Developer Guidelines and Notes" in the "HowTos" section of
+Xastir's Wiki (http://www.xastir.org).  Make sure to follow the
+formatting and indentation rules, and in particular the tab format
+(spaces, not tabs).  If you don't like some of the formatting rules,
+abide by them anyway for consistency (Hey, I don't like some of them
+either, but consistency is more important than ideas I might have of
+coding style!  --we7u).
+
+*) Check the Xastir pages at Sourceforge.  There are sections for bug
+reports and feature requests.  Anyone can log new bugs or feature requests,
+whether or not they are logged into Sourceforge.  This is one of the best
+places to see what needs to be worked on, and to see if anyone else has
+had a similar idea. 
+
+*) Check with the Xastir-Dev list first to see if anyone else is
+working on that particular idea or section of code.
+
+*) Verify on the Xastir-Dev list that your idea has some merit and
+chance of being accepted before you put your valuable time into the
+patch.
+
+*) Make sure you're willing to abide by the GPL license with respect
+to your patch.
+
+*) Use as generic C as possible, and comment what you've done, in
+English please!
+
+*) Keep in mind that Xastir runs on multiple operating systems, so
+code for that.  Some #ifdef's may be required in order to make it
+work for the various operating systems.
+
+*) Xastir can be run in multiple languages, so code for that.  If
+any user text is added, make sure to add language strings for them
+to the language files.  If you don't know a particular language, add
+it to all of the language files in English.  It will be translated
+by others later.
+
+*) Put your patches into either "context diff" or "unified diff"
+format.  Don't submit complete files.  Make sure your diff is
+against the latest CVS sources, as that is the version that the
+developers work from.  Create the diff file against the directories
+recursively if more than one file has been changed:
+
+    diff -ur xastir-1.7.0 xastir-modified-directory > mypatch
+
+Here's a shorthand method if you're doing all this against the CVS
+version.  Do this from the top-level Xastir directory:
+
+    cvs diff -u > mypatch
+
+*) By compressing the patch and attaching it to an e-mail you
+preserve the lines exactly so that the "patch" program will have no
+trouble with it:
+
+    gzip mypatch
+
+This creates mypatch.gz, which you can attach to an e-mail or put up
+on an ftp or http site for download.
+
+*) Contribute patches either directly to one of the active
+developers or to the Xastir-Dev mailing list (you must be subscribed
+in order to post messages there).
+
+*) To apply a patch I typically do this:
+
+    gzip -d mypatch.gz
+
+Check the path listed inside the patch:
+
+    head mypatch
+
+Based on the paths listed inside the patch and the directory at
+which you're currently sitting, adjust the "p" number below so that
+the proper number of directories are stripped from the patch.  This
+example strips off the first two directories:
+
+    patch -p2 <mypatch
+
+
+
+DEBUGGING HINTS:
+----------------
+Xastir is a multi-threaded and multi-process application.  It uses
+both threads and forks to do it's work.  You must have a debugger
+that is capable of following these kinds of twists and turns in a
+program.  Many older versions cannot.
+
+Notes from Tom Russo:
+---------------------
+According to everything I can find about GDB, debugging of
+multithreaded apps has been supported in gdb for some time, and are
+certainly supported in gdb 6.x.  For the last couple days I've been
+running xastir inside gdb instead of at the command prompt ---
+perhaps I won't keep forgetting to start it with -t now, and when it
+crashes I'll be where I need to be.
+
+Jim --- this is possibly an option for you, too, if you're seeing
+segfaults frequently enough and can't solve the core file question.
+Try this:
+
+  gdb /usr/local/bin/xastir
+  > run -t
+
+When it crashes, it'll pop you right out into the debugger, whether
+a core file was created or not.  You could then view the active
+threads:
+  > info threads
+
+and get a stack trace of where the crash happened:
+  > where
+
+You could also probably list the code near where the crash happened:
+  > list
+
+If you send the output of those three commands to the xastir-dev
+list then it might help us narrow down the causes.
+
+
+Notes from Curt:
+----------------
+Note that the meaning of the "-t" command-line flag has been
+reversed.  "xastir -?" should show the change once you compile it.
+This means that we'll do core dumps by default upon segfault instead
+of using the internal Xastir segfault handler.  We've also
+re-enabled the "-g" compile option for GCC so that debugging
+information will remain embedded in the executable (unless you strip
+it).  This should aid the development team to debug problems.
+
+> Also, I cannot find anything in man bash that talks about core
+> dumps nor segmentation faults.
+
+Seems like some stuff we're just supposed to know.  _How_ we're
+supposed to know I don't know either...  ;-)
+
+Perhaps that last bit about SUID/SGID might be a clue:  There are
+often exceptions to the rules for SUID/SGID programs.  Try _not_
+setting Xastir SUID (if you're not using AX.25 kernel networking
+ports that is) to see if you get a core file.  Can you send a
+SIGSEGV to the running process and make it dump?  I just tried this
+and I'm not getting a core file either.
+
+Ah, I see in the "man bash" page:
+
+  ulimit
+        -a  All current limits are reported
+
+This gives me:
+
+  core file size        (blocks, -c) 0
+  data seg size         (kbytes, -d) unlimited
+  file size             (blocks, -f) unlimited
+  max locked memory     (kbytes, -l) 32
+  max memory size       (kbytes, -m) unlimited
+  open files                    (-n) 1024
+  pipe size          (512 bytes, -p) 8
+  stack size            (kbytes, -s) unlimited
+  cpu time             (seconds, -t) unlimited
+  max user processes            (-u) 6139
+  virtual memory        (kbytes, -v) unlimited
+
+So...  Looks like I need to set "ulimit -c" and try again:
+
+  ulimit -c unlimited
+
+Now when I do "kill -11 <pid>" I get this:
+
+  [1]+  Segmentation fault      (core dumped) xastir
+
+and this:
+
+  -rw-------   1 archer users 12320768 2006-02-02 09:31 core.7586
+
+I just added "ulimit -c unlimited" to my .profile.  For what it's
+worth, if Xastir has SUID permission bit set (4755) I don't get a
+core dump, but if it is reset I do (0755).
+
+I can invoke ddd like this (it uses gdb under the hood):
+
+    ddd /usr/local/bin/xastir core.7586 &
+
+or gdb like this:
+
+    gdb -c core.7586 /usr/local/bin/xastir
+
+Once you have the program and core file loaded into the debugger you
+can display a backtrace to see where the program died.  In the case
+of ddd, it's Status->Backtrace, then you click on one of the entries
+to make the source code window display the exact location.
+
+Another good debugger to try is "UPS".
+
+Another note about core files:  Sometimes they get written where you
+don't expect.  I just had one appear in ~/.xastir/tmp, so if you
+think you should have a core file and can't find it, try:
+
+    find . -type f | grep core
+
+The core file may be written to a directory that Xastir is currently
+in, instead of where you started Xastir from.
+
+Customized debugging builds
+---------------------------
+
+Sometimes it is helpful to build xastir with specialized compiler
+options to aid in debugging.  For example, if you're trying to hunt
+down elusive segfaults, and you're using GCC, it might be wise to
+build with "-O -g -fno-inline" to prevent the compiler from optimizing
+quite so vigorously; aggressive optimization can sometimes lead to the
+debugger saying the code died on one line when in fact it's happening
+somewhere else.
+
+To build with custom CFLAGS like this, just tell configure what you
+want CFLAGS to be:
+ ./configure CFLAGS="-O -g -fno-inline"
+
+Naturally, unless you're using build directories separate from the
+source directory (see below under "Segregating specialized builds"),
+you need to build every file after changing configure like this, so do
+a make clean before building:
+
+  make clean
+  make 
+  make install
+
+Remember not to "make install-strip" when trying to do debugging
+builds, or your core files will not have debugging symbols in them and
+it will be harder to get useful information out of the debugger.
+
+Segregating specialized builds
+------------------------------
+
+The automake/autoconf setup of xastir makes it easy to maintain several
+different builds of the code without having to clean out the directory and
+rebuild every time.  One does this with "build directories" and executable
+suffixes.
+
+To use this capability, make sure you're starting with a completely
+clean source directory.  In the directory where you normally do your
+"cvs update", do a make distclean.  This will remove anything that
+configure created as well as anything that make created.  From this
+point forward, you don't build xastir in the source code directory
+anymore.
+
+Make an empty directory somewhere --- this will be your build directory.  
+I put my build directories in parallel with the source code directory.  So
+my tree looks like this:
+
+   XASTIR-DEV
+    |
+    +----/xastir (source directory)
+    |
+    +---/build-normal
+    |
+    +---/build-debug
+and so on.
+
+So I would do:
+  cd XASTIR-DEV
+  mkdir build-normal
+
+In the build directory, you run configure using the path to the configure 
+script:
+
+  cd build-normal
+  ../xastir/configure
+  make
+  make install
+
+The configure script uses the path that you gave when you ran it to figure 
+out where to find the source code.
+
+The beauty of this is you can make a second build without doing a make clean:
+  cd XASTIR-DEV
+  mkdir build-debug
+  cd build-debug
+  ../xastir/configure --program-suffix="-debug" CFLAGS="-O -g -fno-inline"
+  make && sudo  make install
+
+This will build a second binary called "xastir-debug" and install it,
+but because you've done the buil in a separate directory, your normal
+compile is untouched.
+
+  cd ~/XASTIR-DEV/xastir
+  cvs update
+  cd ../build-normal
+  make && sudo make install
+  cd ../build-debug
+  make && sudo make install
+
+will update both of your builds.
+
+I also use this technique to share a single xastir source tree over
+NFS, building the code for multiple operating systems in separate
+build directories. 
+  (log in to CYGWIN machine, mount NFS directory)
+  cd /mounted/directory/XASTIR-DEV
+  mkdir build-cygnus
+  ../xastir/configure
+  make && make install
+
+It can also be used to maintain specialized configurations, for
+example a build with "rtree" disabled, a build with map caching
+disabled, etc.  This is a good development trick to keep yourself
+honest --- make sure you can still build all your custom builds when
+you've done a large hacking run, and want to check if you have broken
+things inside ifdefs.  Doing that without build directories requires a
+huge number of configure/make/make distclean cycles.
+
+More?
+-----
+Anything else?  Let's hear about what's still confusing or needs to
+be expanded in this document.  Thanks!
+
+
+APRS(tm) is a Trademark of Bob Bruninga
+
+Copyright (C) 2006-2012 The Xastir Group
+

@@ -1,0 +1,86 @@
+# $Id: tnc-startup.pico,v 1.22 2012/11/01 18:57:19 we7u Exp $
+#
+# Copyright (C) 2000-2012  The Xastir Group
+#
+# This is the TNC Startup file for a dual-port Paccomm PicoPacket TNC.
+# lines that begin with a pound sign are comments.
+
+ECHO off
+AUTOLF on
+BEACON EVERY 0
+#
+# Clear the GPS buffers
+LTEXT %
+L1TEXT %
+L2TEXT %
+L3TEXT %
+#
+# Set up the NMEA strings we wish to capture:
+#GPSTEXT %
+GPSTEXT $GPRMC
+#
+#LG1TEXT %
+LG1TEXT $GPGGA
+#
+LG2TEXT %
+#LG2TEXT $GPVTG
+#
+LG3TEXT %
+#LG3TEXT $PGRME
+#
+# Digipeat,callsign substitution,
+# no digi of own packets, and digi-once
+DIGIPEAT 7
+ELOC 0
+FLOW off
+FULLDUP off
+GPS off
+HEADERLI off
+HID off
+#CWID every 0
+INTERVAL 0
+LFADD off
+LGETCHAR $05
+LOC E 0
+#
+MALL ON
+MCOM off
+MCON on
+MFILTER 0
+MONITOR 3
+MRPT on
+MSTAMP off
+#
+# Important!  Only uncomment if really needed as a fill-in digi:
+#MYALIAS WIDE1-1
+#
+#MY1ALIAS SAR
+#MY2ALIAS ESAR
+#MY3ALIAS ESAR2
+NEWMODE off
+NOMODE on
+#PACLEN 128
+#
+# Only used in KISS mode?
+PERSIST 128
+#
+PASSALL off
+#
+# Important!  Monitor only PID 0xf0 packets:
+PIDCHECK on
+#
+PMS off
+SCREENLN 0
+#
+# Only used in KISS mode?
+SLOTTIME 15
+#
+TXDELAY 30
+XFLOW off
+#
+#
+# BEACON EVERY 0 must be set to 0 or both Xastir and your TNC will send
+# beacons which will alternate in everyones lists and fill up their
+# logs.  Do NOT set BEACON EVERY to anything other than 0 while Xastir
+# is running.
+
